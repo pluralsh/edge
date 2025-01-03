@@ -44,4 +44,4 @@ create-custom-iso:
 		--size 15200 \
 		--images-size 2000 \
 		--config /HERE/cloud-config.yaml \
- 		--docker-image ${CUSTOM_IMAGE} /custom.img
+ 		--docker-image ${CUSTOM_IMAGE} /HERE/build/out.img
