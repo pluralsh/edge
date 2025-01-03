@@ -7,6 +7,8 @@ OFFICIAL_IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi3-v3.2.3-k3sv1.31
 # Replace it with your device name of memory card
 DEVICE_PATH := /dev/rdisk4
 
+TARGETARCH ?= arm64
+
 ifeq ($(UNAME), Linux)
 	BS := 10MB
 endif
@@ -22,3 +24,6 @@ else
 	xzcat build/kairos-alpine-3.19-standard-arm64-rpi3-v3.2.3-k3sv1.31.2+k3s1.img.xz | \
 	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
 endif
+
+build-custom-image:
+	docker build --build-arg TARGETARCH=$(TARGETARCH) .
