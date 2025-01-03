@@ -13,4 +13,9 @@ RUN curl -L https://github.com/pluralsh/plural-cli/releases/download/${CLI_VERSI
 
 FROM quay.io/kairos/alpine:3.19-standard-arm64-rpi3-v3.2.3-k3sv1.31.2-k3s1
 
+ARG IMAGE_VERSION=0.0.0
+
 COPY --from=tools /usr/local/bin/plural /usr/local/bin/plural
+
+RUN export VERSION="${IMAGE_VERSION}"
+RUN envsubst '${VERSION}' </etc/os-release
