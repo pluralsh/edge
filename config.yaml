@@ -4,3 +4,9 @@ users:
     passwd: kairos
 #    ssh_authorized_keys:
 #     - github:mudler
+
+boot:
+  - name: "Hello world"
+    commands:
+      - |
+        echo "Hello world!"
