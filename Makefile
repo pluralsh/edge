@@ -43,5 +43,5 @@ create-custom-iso:
 		--recovery-partition-size 4200 \
 		--size 15200 \
 		--images-size 2000 \
-		--config /config.yaml \
-		--docker-image ${CUSTOM_IMAGE} /custom.img
+		--config /HERE/cloud-config.yaml \
+ 		--docker-image ${CUSTOM_IMAGE} /custom.img
