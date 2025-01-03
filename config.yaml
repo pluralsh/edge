@@ -5,6 +5,11 @@ users:
 #    ssh_authorized_keys:
 #     - github:mudler
 
+k3s:
+  enabled: true
+  args:
+    - --disable=traefik,servicelb
+
 boot:
   - name: "Hello world"
     commands:

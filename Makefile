@@ -31,10 +31,17 @@ endif
 build-custom-image:
 	docker build --build-arg TARGETARCH=$(TARGETARCH) .
 
-# FIXME
+# TODO: Verify/fix
 create-custom-iso:
-	docker run --rm -ti -v ${PWD}/config.yaml:/config.yaml -v ${PWD}:/tmp quay.io/kairos/auroraboot \
-		--set "container_image=${CUSTOM_IMAGE}"
-		--set "disable_http_server=true" \
-		--set "disable_netboot=true" \
-		--cloud-config /config.yaml
+	mkdir -p build
+	docker run -v ${PWD}:/HERE \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		--privileged -i --rm \
+		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
+		--model rpi3 \
+		--state-partition-size 6200 \
+		--recovery-partition-size 4200 \
+		--size 15200 \
+		--images-size 2000 \
+		--config /config.yaml \
+		--docker-image ${CUSTOM_IMAGE} /custom.img
