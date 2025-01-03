@@ -26,6 +26,7 @@ jobs:
             ghcr.io/pluralsh/edge
             docker.io/pluralsh/edge
           tags: |
+            type=sha
             type=semver,pattern={{version}}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
