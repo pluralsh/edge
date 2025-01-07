@@ -1,17 +1,21 @@
+#cloud-config
+
 hostname: metal-{{ trunc 4 .MachineID }}
+
 users:
-  - name: kairos
-    passwd: kairos
-#    ssh_authorized_keys:
-#     - github:mudler
+  - name: "kairos"                       # The username for the user.
+    passwd: "kairos"
+    groups: [ "admin" ]
 
 k3s:
   enabled: true
+  replace_args: true
   args:
-    - --disable=traefik,servicelb
+    - --node-name=kairos
 
 boot:
-  - name: "Hello world"
+  - name: "Init"
     commands:
-      - |
-        echo "Hello world!"
+      - sudo chmod 755 /etc/rancher/k3s/k3s.yaml
+      - mkdir -p ~/.kube
+      - k3s kubectl config view --raw > $HOME/.kube/config
