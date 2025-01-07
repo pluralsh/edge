@@ -15,7 +15,7 @@ FROM quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 
 ARG IMAGE_VERSION=0.1.0
 
-COPY --from=tools /usr/local/bin/plural /usr/local/bin/plural
+COPY --from=tools /usr/local/bin/plural /usr/local/sbin/plural
 
 RUN export VERSION="${IMAGE_VERSION}"
 RUN envsubst '${VERSION}' </etc/os-release
