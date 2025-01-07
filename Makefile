@@ -2,10 +2,11 @@ PWD := $(shell pwd)
 UNAME := $(shell uname)
 
 # We have experienced some issues with the latest image, that’s why it’s previous version
-OFFICIAL_IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi3-v3.2.3-k3sv1.31.2-k3s1-img
+IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
+OFFICIAL_IMAGE := ${IMAGE}-img
 
 # TODO: Add latest tag and use it here
-CUSTOM_IMAGE := ghcr.io/pluralsh/edge:sha-456f53e
+CUSTOM_IMAGE := ghcr.io/pluralsh/edge:latest
 
 # Replace it with your device name of memory card
 DEVICE_PATH := /dev/rdisk4
@@ -24,7 +25,7 @@ ifneq ($(shell id -u), 0)
 	@echo "You must be root to perform this action"
 else
 	docker run -ti --rm -v ${PWD}:/image quay.io/luet/base util unpack ${OFFICIAL_IMAGE} /image
-	xzcat build/kairos-alpine-3.19-standard-arm64-rpi3-v3.2.3-k3sv1.31.2+k3s1.img.xz | \
+	xzcat build/${IMAGE}.img.xz | \
 	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
 endif
 
@@ -38,7 +39,7 @@ create-custom-iso:
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--privileged -i --rm \
 		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
-		--model rpi3 \
+		--model rpi4 \
 		--state-partition-size 6200 \
 		--recovery-partition-size 4200 \
 		--size 15200 \
