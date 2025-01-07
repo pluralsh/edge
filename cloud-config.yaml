@@ -16,6 +16,6 @@ k3s:
 boot:
   - name: "Init"
     commands:
-      - sudo chmod 755 /etc/rancher/k3s/k3s.yaml
+      - chmod 755 /etc/rancher/k3s/k3s.yaml
       - mkdir -p ~/.kube
       - k3s kubectl config view --raw > $HOME/.kube/config
