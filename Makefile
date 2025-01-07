@@ -1,8 +1,7 @@
 PWD := $(shell pwd)
 UNAME := $(shell uname)
 
-IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
-OFFICIAL_IMAGE := ${IMAGE}-img
+OFFICIAL_IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 
 CUSTOM_IMAGE := ghcr.io/pluralsh/edge:latest
 
@@ -22,8 +21,8 @@ flash-official-image:
 ifneq ($(shell id -u), 0)
 	@echo "You must be root to perform this action"
 else
-	docker run -ti --rm -v ${PWD}:/image quay.io/luet/base util unpack ${OFFICIAL_IMAGE} /image
-	xzcat build/${IMAGE}.img.xz | \
+	docker run -ti --rm -v ${PWD}:/image quay.io/luet/base util unpack ${OFFICIAL_IMAGE}-img /image
+	xzcat build/${OFFICIAL_IMAGE}.img.xz | \
 	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
 endif
 
