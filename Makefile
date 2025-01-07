@@ -31,6 +31,7 @@ build-custom-image:
 	docker build --build-arg TARGETARCH=$(TARGETARCH) .
 
 create-custom-iso:
+	rm -r build
 	mkdir -p build
 	docker run -v ${PWD}:/HERE \
 		-v /var/run/docker.sock:/var/run/docker.sock \
