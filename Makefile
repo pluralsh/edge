@@ -1,11 +1,9 @@
 PWD := $(shell pwd)
 UNAME := $(shell uname)
 
-# We have experienced some issues with the latest image, that’s why it’s previous version
 IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 OFFICIAL_IMAGE := ${IMAGE}-img
 
-# TODO: Add latest tag and use it here
 CUSTOM_IMAGE := ghcr.io/pluralsh/edge:latest
 
 # Replace it with your device name of memory card
@@ -32,7 +30,6 @@ endif
 build-custom-image:
 	docker build --build-arg TARGETARCH=$(TARGETARCH) .
 
-# TODO: Verify/fix
 create-custom-iso:
 	mkdir -p build
 	docker run -v ${PWD}:/HERE \
