@@ -1,0 +1,57 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: cloud-config
+stringData:
+  userdata: |
+    #cloud-config
+    hostname: metal-{{ trunc 4 .MachineID }}
+    users:
+      - name: "kairos"
+        passwd: "kairos"
+        groups: [ "admin" ]
+    k3s:
+      enabled: true
+      replace_args: true
+      args:
+        - --node-name=kairos
+    stages:
+      boot:
+        - name: "Init"
+          commands:
+            - chmod 755 /etc/rancher/k3s/k3s.yaml
+    plural:
+      token: ""
+      url: console.plrl-dev-aws.onplural.sh
+---
+kind: OSArtifact
+apiVersion: build.kairos.io/v1alpha2
+metadata:
+  name: kairos-plural
+spec:
+  imageName: "quay.io/kairos/alpine:3.19-standard-amd64-generic-v3.2.4-k3sv1.31.3-k3s1"
+  iso: true
+  bundles:
+    - ghcr.io/pluralsh/kairos-plural-bundle:latest
+  cloudConfigRef:
+    name: cloud-config
+    key: userdata
+  exporters:
+    - template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: upload
+              image: quay.io/curl/curl
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - |
+                  for f in $(ls /artifacts)
+                  do
+                  curl -T /artifacts/$f http://osartifactbuilder-operator-osbuilder-nginx/upload/$f
+                  done
+              volumeMounts:
+                - name: artifacts
+                  mountPath: /artifacts
