@@ -1,18 +1,20 @@
 FROM alpine AS build
 
-# renovate: datasource=github-releases depName=pluralsh/plural-cli
-ENV VERSION=v0.11.1
-
 ARG TARGETARCH
 
-ADD "https://github.com/pluralsh/plural-cli/releases/download/plural-cli_${VERSION}_Linux_${TARGETARCH}.tar.gz" /tmp
-RUN tar xvz /tmp/plural-cli_${VERSION}_Linux_${TARGETARCH}.tar.gz /tmp  && \
-  ls -al /tmp && \
-  mv /tmp/plural /usr/local/bin/plural && \
-  chmod +x /usr/local/bin/plural
+# renovate: datasource=github-releases depName=pluralsh/plural-cli
+ENV PLURAL_VERSION=0.11.1
+ADD "https://github.com/pluralsh/plural-cli/releases/download/v${PLURAL_VERSION}/plural-cli_${PLURAL_VERSION}_Linux_${TARGETARCH}.tar.gz" /
+RUN tar -xzvf /plural-cli_${PLURAL_VERSION}_Linux_${TARGETARCH}.tar.gz plural
+
+# renovate: datasource=github-releases depName=helm/helm
+ENV HELM_VERSION=v3.15.1
+ADD "https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" /
+RUN tar -xzvf /helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz linux-${TARGETARCH}/helm
 
 FROM --platform=$BUILDPLATFORM scratch
+
 ARG TARGETARCH
-COPY ./run.sh /
-COPY --from=build /tmp/plural .
-COPY ./assets /assets
+
+COPY --from=build --chmod=755 /plural .
+COPY --from=build --chmod=755 /linux-${TARGETARCH}/helm .
