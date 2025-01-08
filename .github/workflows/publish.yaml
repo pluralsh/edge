@@ -9,7 +9,7 @@ on:
 
 jobs:
   publish-docker:
-    name: Build and push custom image
+    name: Build and push bundle image
     runs-on: ubuntu-20.04
     permissions:
       contents: 'read'
@@ -23,8 +23,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/pluralsh/edge
-            docker.io/pluralsh/edge
+            ghcr.io/pluralsh/kairos-plural-bundle
+            docker.io/pluralsh/kairos-plural-bundle
           tags: |
             type=sha
             type=semver,pattern={{version}}
@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: "."
-          file: "./Dockerfile"
+          file: "./bundle.Dockerfile"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

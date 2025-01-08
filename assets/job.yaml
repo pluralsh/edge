@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: plural-join
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: plural-join
+subjects:
+  - kind: ServiceAccount
+    name: plural-join
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: plural-join
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - name: plural-cloud
+          image: "@BASE_IMAGE@"
+          command: ["plural"]
+          args: ["cd", "clusters", "bootstrap", "--project", "@PROJECT@", "--name", "@CLUSTER_NAME@", "--tag", "@TAG@"]
+          env:
+            - name: PLURAL_CONSOLE_TOKEN
+              value: "@TOKEN@"
+            - name: PLURAL_CONSOLE_URL
+              value: "@URL@"
+      restartPolicy: Never
+      serviceAccountName: plural-join
+  backoffLimit: 4
