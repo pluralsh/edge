@@ -6,7 +6,7 @@ K3S_MANIFEST_DIR=${K3S_MANIFEST_DIR:-/var/lib/rancher/k3s/server/manifests/}
 
 # DEFAULTS
 # renovate: datasource=docker depName=ghcr.io/pluralsh/plural-cli-cloud
-BASE_IMAGE=ghcr.io/pluralsh/plural-cli-cloud:0.11.1
+BASE_IMAGE="ghcr.io/pluralsh/plural-cli-cloud:0.11.1"
 TOKEN=""
 URL=""
 CLUSTER_NAME="plural-edge"
@@ -26,7 +26,7 @@ templ() {
     local file="$3"
     local value="$2"
     local sentinel="$1"
-    sed -i "s/@${sentinel}@/${value}/g" "${file}"
+    sed -i "s/@${sentinel}@/$(sed -e 's/[&\\/]/\\&/g; s/$/\\/' -e '$s/\\$//' <<<"${value}")/g" "${file}"
 }
 
 readConfig() {
