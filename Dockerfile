@@ -1,21 +1,18 @@
-ARG ALPINE_VERSION=3.21.0
-ARG TOOLS_IMAGE=alpine:${ALPINE_VERSION}
+FROM alpine AS build
 
-FROM ${TOOLS_IMAGE} AS tools
+# renovate: datasource=github-releases depName=pluralsh/plural-cli
+ENV VERSION=v0.11.1
 
-ARG TARGETARCH=arm64
-ENV CLI_VERSION=v0.11.1
+ARG TARGETARCH
 
-RUN apk update && apk add curl
-RUN curl -L https://github.com/pluralsh/plural-cli/releases/download/${CLI_VERSION}/plural-cli_${CLI_VERSION#v}_Linux_${TARGETARCH}.tar.gz | tar xvz plural && \
-  mv plural /usr/local/bin/plural && \
+ADD "https://github.com/pluralsh/plural-cli/releases/download/plural-cli_${VERSION}_Linux_${TARGETARCH}.tar.gz" /tmp
+RUN tar xvz /tmp/plural-cli_${VERSION}_Linux_${TARGETARCH}.tar.gz /tmp  && \
+  ls -al /tmp && \
+  mv /tmp/plural /usr/local/bin/plural && \
   chmod +x /usr/local/bin/plural
 
-FROM quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
-
-ARG IMAGE_VERSION=0.1.0
-
-COPY --from=tools /usr/local/bin/plural /usr/sbin/plural
-
-RUN export VERSION="${IMAGE_VERSION}"
-RUN envsubst '${VERSION}' </etc/os-release
+FROM --platform=$BUILDPLATFORM scratch
+ARG TARGETARCH
+COPY ./run.sh /
+COPY --from=build /tmp/plural .
+COPY ./assets /assets
