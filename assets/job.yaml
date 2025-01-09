@@ -28,7 +28,6 @@ spec:
       containers:
         - name: plural-cloud
           image: "@BASE_IMAGE@"
-          command: ["plural"]
           args: ["cd", "clusters", "bootstrap", "--project", "@PROJECT@", "--name", "@CLUSTER_NAME@", "--tag", "@TAG@"]
           env:
             - name: PLURAL_CONSOLE_TOKEN
