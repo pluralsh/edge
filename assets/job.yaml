@@ -36,4 +36,3 @@ spec:
               value: "@URL@"
       restartPolicy: Never
       serviceAccountName: plural-join
-  backoffLimit: 4
