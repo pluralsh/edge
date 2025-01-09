@@ -27,7 +27,7 @@ templ "TOKEN" "${TOKEN}" cloud-config.yaml
 templ "PASSWORD" "${PASSWORD}" cloud-config.yaml
 
 mkdir -p build
-docker pull $IMAGE
+docker pull -q $IMAGE
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp \
