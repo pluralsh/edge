@@ -2,7 +2,7 @@
 hostname: plural-edge-{{ trunc 10 .MachineID }}
 users:
   - name: "kairos"
-    passwd: "kairos"
+    passwd: @PASSWORD@
     groups: [ "admin" ]
 k3s:
   enabled: true
@@ -13,5 +13,5 @@ bundles:
   - targets:
       - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.1
 plural:
-  token: ""
-  url: console.plrl-dev-aws.onplural.sh
+  token: @URL@
+  url: @TOKEN@

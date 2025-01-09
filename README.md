@@ -1,0 +1,20 @@
+# Edge
+
+Get Plural running on your edge devices.
+
+## Prerequisites
+
+- edge device — we have tested it on Raspberry Pi 4 with 8GB RAM
+- memory card or another storage device — it should have at least 16 GB of size
+- running management cluster that hosts Plural Console and supporting operators
+
+## Setup on Raspberry Pi 4
+
+The general process of setting up your Raspberry Pi 4 is pretty straightforward,
+and it can be started with the following command:
+
+```bash
+curl https://raw.githubusercontent.com/pluralsh/edge/main/scripts/get-plural-edge-rpi4 | bash
+```
+
+We recommend running it from an empty directory.
