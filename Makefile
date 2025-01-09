@@ -29,7 +29,7 @@ build-cli: ## build CLI image
 	docker build -f cli.Dockerfile --build-arg TARGETARCH=$(TARGETARCH) .
 
 .PHONY: create-iso
-create-iso: ## create ISO file
+create-iso: ## create ISO file with cloud config
 	mkdir -p build
 	docker pull ${IMAGE}
 	docker run -v ${PWD}:/HERE \
