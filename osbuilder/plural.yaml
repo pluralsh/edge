@@ -5,7 +5,7 @@ metadata:
 stringData:
   userdata: |
     #cloud-config
-    hostname: metal-{{ trunc 4 .MachineID }}
+    hostname: plural-edge-{{ trunc 10 .MachineID }}
     users:
       - name: "kairos"
         passwd: "kairos"
@@ -20,6 +20,9 @@ stringData:
         - name: "Init"
           commands:
             - chmod 755 /etc/rancher/k3s/k3s.yaml
+        bundles:
+    - targets:
+        - run://ghcr.io/pluralsh/kairos-plural-bundle:latest
     plural:
       token: ""
       url: console.plrl-dev-aws.onplural.sh
