@@ -37,7 +37,7 @@ create-iso: ## create ISO file with cloud config
 		-v "${PWD}"/build:/tmp \
 		-v "${PWD}"/cloud-config.yaml:/cloud-config.yaml \
 		--privileged -ti --rm \
-		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot \
+		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
 		--model rpi4 \
 		--config /cloud-config.yaml \
 		--docker-image ${IMAGE} /tmp/kairos.img
