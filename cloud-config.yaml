@@ -13,5 +13,5 @@ bundles:
   - targets:
       - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.1
 plural:
-  token: @URL@
-  url: @TOKEN@
+  token: @TOKEN@
+  url: @URL@
