@@ -6,7 +6,7 @@ K3S_MANIFEST_DIR=${K3S_MANIFEST_DIR:-/var/lib/rancher/k3s/server/manifests/}
 
 # DEFAULTS
 # renovate: datasource=docker depName=ghcr.io/pluralsh/plural-cli-cloud
-BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:latest"
+BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:0.11.1"
 TOKEN=""
 URL=""
 CLUSTER_NAME_PREFIX="plural-edge"
