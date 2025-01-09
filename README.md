@@ -17,3 +17,4 @@ and it can be started with the following command:
 curl https://raw.githubusercontent.com/pluralsh/edge/main/scripts/get-plural-edge-rpi4 | bash
 ```
 
+We recommend running it from an empty directory.
