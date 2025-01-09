@@ -1,9 +1,7 @@
 PWD := $(shell pwd)
 UNAME := $(shell uname)
 
-OFFICIAL_IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
-
-CUSTOM_IMAGE := ghcr.io/pluralsh/edge:latest
+IMAGE := quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 
 # Replace it with your device name of memory card
 DEVICE_PATH := /dev/rdisk4
@@ -26,11 +24,28 @@ build: build-bundle build-cli ## build all images
 build-bundle: ## build bundle image
 	docker build -f bundle.Dockerfile --build-arg TARGETARCH=$(TARGETARCH) .
 
-.PHONY: buile-cli
+.PHONY: build-cli
 build-cli: ## build CLI image
 	docker build -f cli.Dockerfile --build-arg TARGETARCH=$(TARGETARCH) .
 
-##@ Other
+.PHONY: create-iso
+create-iso: ## create ISO file
+	rm -r build
+	mkdir -p build
+	docker pull $IMAGE
+	docker run -v $PWD:/HERE \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		--privileged -i --rm \
+		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
+		--model rpi4 \
+		--state-partition-size 6200 \
+		--recovery-partition-size 4200 \
+		--size 15200 \
+		--images-size 2000 \
+		--config /HERE/cloud-config.yaml \
+		--docker-image $IMAGE /HERE/build/out.img
+
+##@ General
 
 .PHONY: help
 help: ## show help
@@ -45,17 +60,4 @@ else
 	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
 endif
 
-create-custom-iso:
-	rm -r build
-	mkdir -p build
-	docker run -v ${PWD}:/HERE \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		--privileged -i --rm \
-		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
-		--model rpi4 \
-		--state-partition-size 6200 \
-		--recovery-partition-size 4200 \
-		--size 15200 \
-		--images-size 2000 \
-		--config /HERE/cloud-config.yaml \
- 		--docker-image ${CUSTOM_IMAGE} /HERE/build/out.img
+
