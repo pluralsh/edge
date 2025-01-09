@@ -18,3 +18,5 @@ ARG TARGETARCH
 
 COPY --from=build --chmod=755 /plural .
 COPY --from=build --chmod=755 /linux-${TARGETARCH}/helm .
+
+ENTRYPOINT [ "/plural" ]
