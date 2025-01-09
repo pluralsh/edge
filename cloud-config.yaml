@@ -1,0 +1,17 @@
+#cloud-config
+hostname: plural-edge-{{ trunc 10 .MachineID }}
+users:
+  - name: "kairos"
+    passwd: "kairos"
+    groups: [ "admin" ]
+k3s:
+  enabled: true
+  replace_args: true
+  args:
+    - --node-name=kairos
+bundles:
+  - targets:
+      - run://ghcr.io/pluralsh/kairos-plural-bundle:latest
+plural:
+  token: ""
+  url: console.plrl-dev-aws.onplural.sh
