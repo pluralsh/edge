@@ -25,6 +25,19 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - name: wait-for-k8s-api
+          image: alpine/curl:8.10.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Waiting for Kubernetes API server to be ready..."
+              until curl --silent --fail --max-time 5 --insecure https://kubernetes.default/readyz; do
+                echo "API server is not ready, retrying in 5 seconds..."
+                sleep 5
+              done
+              echo "Kubernetes API server is ready!"
       containers:
         - name: plural-cloud
           image: "@BASE_IMAGE@"
