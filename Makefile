@@ -39,6 +39,10 @@ create-iso: ## create ISO file with cloud config
 		--privileged -ti --rm \
 		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
 		--model rpi4 \
+		--state-partition-size 6200 \
+		--recovery-partition-size 4200 \
+		--size 15200 \
+		--images-size 2000 \
 		--config /cloud-config.yaml \
 		--docker-image ${IMAGE} /tmp/kairos.img
 
