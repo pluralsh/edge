@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ex
 
@@ -26,7 +26,7 @@ templ() {
     local file="$3"
     local value="$2"
     local sentinel="$1"
-    sed -i "s/@${sentinel}@/$(sed -e 's/[&\\/]/\\&/g; s/$/\\/' -e '$s/\\$//' <<<"${value}")/g" "${file}"
+    sed -i "s/@${sentinel}@/$(echo "${value}" | sed -e 's/[&\\/]/\\&/g; s/$/\\/' -e '$s/\\$//')/g" "${file}"
 }
 
 readConfig() {
