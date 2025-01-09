@@ -20,3 +20,5 @@ chmod 700 get-plural-edge-rpi4
 ```
 
 We recommend running it from an empty directory.
+
+The current setup assumes that Raspberry Pi is connected to the network via Ethernet cable.
