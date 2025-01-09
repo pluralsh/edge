@@ -15,12 +15,7 @@ stringData:
       replace_args: true
       args:
         - --node-name=kairos
-    stages:
-      boot:
-        - name: "Init"
-          commands:
-            - chmod 755 /etc/rancher/k3s/k3s.yaml
-        bundles:
+    bundles:
     - targets:
         - run://ghcr.io/pluralsh/kairos-plural-bundle:latest
     plural:
