@@ -17,7 +17,7 @@ stringData:
         - --node-name=kairos
     bundles:
     - targets:
-        - run://ghcr.io/pluralsh/kairos-plural-bundle:latest
+        - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.1
     plural:
       token: ""
       url: console.plrl-dev-aws.onplural.sh
