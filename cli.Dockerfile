@@ -12,7 +12,7 @@ ENV HELM_VERSION=v3.15.1
 ADD "https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" /
 RUN tar -xzvf /helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz linux-${TARGETARCH}/helm
 
-FROM --platform=$BUILDPLATFORM scratch
+FROM --platform=$BUILDPLATFORM alpine:3.21.2
 
 ARG TARGETARCH
 
