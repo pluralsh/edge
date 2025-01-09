@@ -10,7 +10,7 @@ on:
 jobs:
   publish-bundle:
     name: Build and push bundle image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -45,7 +45,7 @@ jobs:
           username: mjgpluralsh
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: "."
           file: "./bundle.Dockerfile"
@@ -59,7 +59,7 @@ jobs:
             GIT_COMMIT=${{ github.sha }}
   publish-cli:
     name: Build and push CLI image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -94,7 +94,7 @@ jobs:
           username: mjgpluralsh
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: "."
           file: "./cli.Dockerfile"
