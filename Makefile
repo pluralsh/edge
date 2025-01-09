@@ -30,10 +30,9 @@ build-cli: ## build CLI image
 
 .PHONY: create-iso
 create-iso: ## create ISO file
-	rm -r build
 	mkdir -p build
-	docker pull $IMAGE
-	docker run -v $PWD:/HERE \
+	docker pull ${IMAGE}
+	docker run -v ${PWD}:/HERE \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--privileged -i --rm \
 		--entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
@@ -43,7 +42,7 @@ create-iso: ## create ISO file
 		--size 15200 \
 		--images-size 2000 \
 		--config /HERE/cloud-config.yaml \
-		--docker-image $IMAGE /HERE/build/out.img
+		--docker-image ${IMAGE} /HERE/build/out.img
 
 ##@ General
 
