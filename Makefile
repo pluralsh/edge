@@ -46,19 +46,18 @@ create-iso: ## create ISO file with cloud config
 		--config /cloud-config.yaml \
 		--docker-image ${IMAGE} /tmp/kairos.img
 
+.PHONY: flash-official-image
+flash-official-image: ## flashes your device with official Kairos image, update DEVICE_PATH before running it as root
+ifneq ($(shell id -u), 0)
+	@echo "You must be root to perform this action"
+else
+	docker run -ti --rm -v ${PWD}:/image quay.io/luet/base util unpack ${IMAGE}-img /image
+	xzcat build/${IMAGE}.img.xz | \
+	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
+endif
+
 ##@ General
 
 .PHONY: help
 help: ## show help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
-
-flash-official-image:
-ifneq ($(shell id -u), 0)
-	@echo "You must be root to perform this action"
-else
-	docker run -ti --rm -v ${PWD}:/image quay.io/luet/base util unpack ${OFFICIAL_IMAGE}-img /image
-	xzcat build/${OFFICIAL_IMAGE}.img.xz | \
-	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
-endif
-
-
