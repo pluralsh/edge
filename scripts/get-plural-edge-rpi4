@@ -48,4 +48,4 @@ Flashing can be done with:
 
 sudo dd if build/kairos.img of=<DEVICE_PATH> oflag=sync status=progress bs=$BS
 
-<DEVICE_PATH> needs to be replaced witth path of your storage device, i.e. /dev/rdisk4"
+<DEVICE_PATH> needs to be replaced with path of your storage device, i.e. /dev/rdisk4"
