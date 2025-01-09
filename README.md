@@ -19,8 +19,9 @@ curl https://raw.githubusercontent.com/pluralsh/edge/main/get-plural-edge | bash
 Once the process completes you should flash your storage device and use it on your edge device. To flash your storage device, you can use [balenaEtcher](https://etcher.balena.io) or shell command:
 
 ```bash
-sudo dd of=<device_path> oflag=sync status=progress bs=<bs>
+sudo dd if=<image_path> of=<device_path> oflag=sync status=progress bs=<bs>
 ```
 Where:
+- `image_path` is a path of your image that was generated in the previous step, i.e. `kairos.img`
 - `device_path` is a path of your storage device, i.e. `/dev/rdisk4`
 - `bs` is block size, i.e. `10m` (on macOS) or `10MB` (on Linux)
