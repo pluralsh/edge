@@ -19,8 +19,8 @@ endif
 
 ##@ Build
 
-.PHONY: build ## build images
-build: build-bundle build-cli
+.PHONY: build
+build: build-bundle build-cli ## build all images
 
 .PHONY: buile-bundle
 build-bundle: ## build bundle image
@@ -44,8 +44,6 @@ else
 	xzcat build/${OFFICIAL_IMAGE}.img.xz | \
 	sudo dd of=${DEVICE_PATH} oflag=sync status=progress bs=${BS}
 endif
-
-
 
 create-custom-iso:
 	rm -r build
