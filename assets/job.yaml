@@ -33,7 +33,7 @@ spec:
             - -c
             - |
               echo "Waiting for Kubernetes API server to be ready..."
-              until curl --silent --fail --max-time 5 --insecure https://kubernetes.default/readyz; do
+              until curl --fail --max-time 5 --insecure -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://kubernetes.default/readyz; do
                 echo "API server is not ready, retrying in 5 seconds..."
                 sleep 5
               done
