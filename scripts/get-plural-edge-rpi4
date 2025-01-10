@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 IMAGE=quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 
 case "$(uname)" in
@@ -16,18 +18,25 @@ templ() {
 
 read -p "Please enter your Plural Console URL: " -r URL
 read -p "Please enter your Plural Console token: " -rs TOKEN
-echo -e "\n"
+echo -e ""
 read -p "Please enter password for kairos user: " -rs PASSWORD
-echo -e "\n"
+echo -e ""
 
+echo "Downloading cloud-config.yaml..."
 curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/cloud-config.yaml -o cloud-config.yaml
 
+echo "Templating cloud-config.yaml..."
 templ "URL" "${URL}" cloud-config.yaml
 templ "TOKEN" "${TOKEN}" cloud-config.yaml
 templ "PASSWORD" "${PASSWORD}" cloud-config.yaml
 
+echo "Creating build directory..."
 mkdir -p build
+
+echo "Pulling $IMAGE..."
 docker pull -q $IMAGE
+
+echo "Creating image..."
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp \
