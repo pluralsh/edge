@@ -19,7 +19,11 @@ jobs:
     steps:
       - name: Cancel job
         if: ${{ !(startsWith(github.ref, format('refs/tags/{0}', matrix.image)) || github.ref == 'refs/heads/main') }}
-        run: exit 0
+        env:
+          GH_TOKEN: ${{ secrets. GITHUB_TOKEN }}
+        run: |
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
       - name: Checkout
         uses: actions/checkout@v4
       - name: Docker meta
