@@ -17,7 +17,7 @@ stringData:
         - --node-name=kairos
     bundles:
     - targets:
-        - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.1
+        - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.4
     plural:
       token: ""
       url: console.plrl-dev-aws.onplural.sh
@@ -27,10 +27,11 @@ apiVersion: build.kairos.io/v1alpha2
 metadata:
   name: kairos-plural
 spec:
-  imageName: "quay.io/kairos/alpine:3.19-standard-amd64-generic-v3.2.4-k3sv1.31.3-k3s1"
+  imageName: "quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1"
   iso: true
+  model: rpi4
   bundles:
-    - ghcr.io/pluralsh/kairos-plural-bundle:latest
+    - ghcr.io/pluralsh/kairos-plural-bundle:0.1.4
   cloudConfigRef:
     name: cloud-config
     key: userdata
