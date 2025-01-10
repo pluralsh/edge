@@ -17,7 +17,7 @@ jobs:
       id-token: 'write'
       packages: 'write'
     steps:
-      - name: Verify job
+      - name: Cancel job
         if: ${{ !(startsWith(github.ref, format('refs/tags/{0}', matrix.image)) || github.ref == 'refs/heads/main') }}
         run: exit 0
       - name: Checkout
