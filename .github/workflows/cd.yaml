@@ -9,7 +9,7 @@ jobs:
   publish:
     strategy:
       matrix:
-        image: [ plural-cli, plural-bundle, trust-manager-bundle ]
+        image: [ plural-cli, plural-bundle, plural-images-bundle ]
     name: Build and push ${{ matrix.image }} image
     runs-on: ubuntu-22.04
     permissions:
