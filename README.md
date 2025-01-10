@@ -14,7 +14,7 @@ The general process of setting up your Raspberry Pi 4 is pretty straightforward,
 and it can be started with the following command:
 
 ```bash
-curl -fsSL -o get-plural-edge-rpi4 https://raw.githubusercontent.com/pluralsh/edge/main/scripts/get-plural-edge-rpi4
+curl -fsSL -o get-plural-edge-rpi4 https://raw.githubusercontent.com/pluralsh/edge/main/hack/get-plural-edge-rpi4
 chmod 700 get-plural-edge-rpi4
 ./get-plural-edge-rpi4
 ```

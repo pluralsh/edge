@@ -23,7 +23,7 @@ read -p "Please enter password for kairos user: " -rs PASSWORD
 echo -e ""
 
 echo "Downloading cloud-config.yaml..."
-curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/cloud-config.yaml -o cloud-config.yaml
+curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o cloud-config.yaml
 
 echo "Templating cloud-config.yaml..."
 templ "URL" "${URL}" cloud-config.yaml
