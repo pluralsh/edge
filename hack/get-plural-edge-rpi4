@@ -67,6 +67,6 @@ echo "Successfully generated image and saved it to build directory.
 Now you can flash your storage device and conect it to your Raspberry Pi 4.
 Flashing can be done with:
 
-sudo dd if build/kairos.img of=<DEVICE_PATH> oflag=sync status=progress bs=$BS
+sudo dd if=build/kairos.img of=<DEVICE_PATH> oflag=sync status=progress bs=$BS
 
 <DEVICE_PATH> needs to be replaced with path of your storage device, i.e. /dev/rdisk4"
