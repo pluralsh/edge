@@ -1,6 +1,6 @@
 # Build artifacts
-build
-data
+hack/build
+hack/image
 
 # IDE files
 /.idea
