@@ -34,6 +34,8 @@ echo "Creating build directory..."
 mkdir -p build
 
 echo "Preparing image..."
+curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/prepare-image.sh -o prepare-image.sh
+chmod +x prepare-image.sh
 mkdir -p image
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
