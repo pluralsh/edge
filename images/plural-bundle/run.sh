@@ -75,4 +75,4 @@ for FILE in assets/*; do
   templ "TAG" "${TAG}" "${FILE}"
 done;
 
-cp -rf assets/* "${K3S_MANIFEST_DIR}"
+cp -rfv assets/* "${K3S_MANIFEST_DIR}"
