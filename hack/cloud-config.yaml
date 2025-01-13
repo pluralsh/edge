@@ -12,6 +12,7 @@ k3s:
 bundles:
   - targets:
       - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.4
+      - run://ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.0
 plural:
   token: @TOKEN@
   url: @URL@
