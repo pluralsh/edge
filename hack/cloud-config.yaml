@@ -11,8 +11,11 @@ k3s:
     - --node-name=kairos
 bundles:
   - targets:
-      - run://ghcr.io/pluralsh/kairos-plural-bundle:0.1.4
-      - run://ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.0
+      - run:///run/initramfs/live/plural-bundle.tar
+    local_file: true
+  - targets:
+      - run:///run/initramfs/live/plural-images-bundle.tar
+    local_file: true
 plural:
   token: @TOKEN@
   url: @URL@
