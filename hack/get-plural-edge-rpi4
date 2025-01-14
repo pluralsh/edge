@@ -3,6 +3,8 @@
 set -e
 
 IMAGE=quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
+CLOUD_CONFIG=cloud-config.yaml
+SKIP_TEMPLATING=n
 
 case "$(uname)" in
   Linux) BS=10MB ;;
@@ -16,19 +18,25 @@ templ() {
     sed -i "s/@${sentinel}@/$(echo "${value}" | sed -e 's/[&\\/]/\\&/g; s/$/\\/' -e '$s/\\$//')/g" "${file}"
 }
 
-read -p "Please enter your Plural Console URL: " -r URL
-read -p "Please enter your Plural Console token: " -rs TOKEN
-echo -e ""
-read -p "Please enter password for kairos user: " -rs PASSWORD
-echo -e ""
+if [ -f $CLOUD_CONFIG ]; then
+  read -p "Configuration file $CLOUD_CONFIG already exists. Would you like to skip templating and use it? (y/n) " -r SKIP_TEMPLATING
+fi
 
-echo "Downloading cloud-config.yaml..."
-curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o cloud-config.yaml
+if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
+  read -p "Please enter your Plural Console URL: " -r URL
+  read -p "Please enter your Plural Console token: " -rs TOKEN
+  echo -e ""
+  read -p "Please enter password for kairos user: " -rs PASSWORD
+  echo -e ""
 
-echo "Templating cloud-config.yaml..."
-templ "URL" "${URL}" cloud-config.yaml
-templ "TOKEN" "${TOKEN}" cloud-config.yaml
-templ "PASSWORD" "${PASSWORD}" cloud-config.yaml
+  echo "Downloading cloud-config.yaml..."
+  curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o cloud-config.yaml
+
+  echo "Templating cloud-config.yaml..."
+  templ "URL" "${URL}" cloud-config.yaml
+  templ "TOKEN" "${TOKEN}" cloud-config.yaml
+  templ "PASSWORD" "${PASSWORD}" cloud-config.yaml
+fi
 
 echo "Creating build directory..."
 mkdir -p build
