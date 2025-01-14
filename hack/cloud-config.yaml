@@ -9,6 +9,8 @@ k3s:
   replace_args: true
   args:
     - --node-name=kairos
+    - --embedded-registry
+    - --disable=traefik,servicelb
 bundles:
   - targets:
       - run:///run/initramfs/live/plural-bundle.tar
