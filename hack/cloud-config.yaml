@@ -1,5 +1,6 @@
 #cloud-config
 hostname: plural-edge-{{ trunc 10 .MachineID }}
+
 users:
   - name: "kairos"
     passwd: @PASSWORD@
@@ -19,13 +20,15 @@ k3s:
     - --node-name=kairos
     - --embedded-registry
     - --disable=traefik,servicelb
+
 bundles:
   - targets:
-      - run:///usr/local/bundles/plural-bundle.tar
+      - run:///run/initramfs/cos-state/plural/bundles/plural-bundle.tar
     local_file: true
   - targets:
-      - run:///usr/local/bundles/plural-images-bundle.tar
+      - run:///run/initramfs/cos-state/plural/bundles/plural-images-bundle.tar
     local_file: true
+
 plural:
   token: @TOKEN@
   url: @URL@

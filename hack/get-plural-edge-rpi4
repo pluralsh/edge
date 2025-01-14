@@ -39,17 +39,20 @@ if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
 fi
 
 echo "Building image..."
-curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/prepare-image.sh -o prepare-image.sh
+curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/build-arm-image.sh -o build-arm-image.sh
 chmod +x prepare-image.sh
 mkdir -p build
+
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp/build \
   -v "$PWD"/cloud-config.yaml:/cloud-config.yaml \
-  -v "$PWD"/prepare-image.sh:/prepare-image.sh \
-  -e IMAGE=$IMAGE \
+  -v "$PWD"/build-arm-image.sh:/build-arm-image.sh \
   --privileged -ti --rm \
-  --entrypoint=/prepare-image.sh quay.io/kairos/auroraboot:v0.4.3
+  --entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
+  --model rpi4 \
+  --docker-image "${IMAGE}" \
+  --config /cloud-config.yaml /tmp/build/kairos.img
 
 echo "Successfully generated image and saved it to build directory.
 Now you can flash your storage device and conect it to your Raspberry Pi 4.
