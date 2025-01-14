@@ -68,8 +68,7 @@ docker run \
   --size 15200 \
   --images-size 2000 \
   --directory /tmp/image \
-  --config /cloud-config.yaml \
-  --docker-image $IMAGE /tmp/build/kairos.img
+  --config /cloud-config.yaml /tmp/build/kairos.img
 
 echo "Successfully generated image and saved it to build directory.
 Now you can flash your storage device and conect it to your Raspberry Pi 4.
