@@ -473,12 +473,12 @@ mkdir -p $BUNDLES_DIRECTORY
 
 PLURAL_BUNDLE="ghcr.io/pluralsh/kairos-plural-bundle:0.1.4"
 echo "Adding $PLURAL_BUNDLE bundle..."
-docker pull $PLURAL_BUNDLE
+docker pull --platform=arm64 $PLURAL_BUNDLE
 docker save $PLURAL_BUNDLE -o $BUNDLES_DIRECTORY/plural-bundle.tar
 
 PLURAL_IMAGES_BUNDLE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.1"
 echo "Adding $PLURAL_IMAGES_BUNDLE bundle..."
-docker pull $PLURAL_IMAGES_BUNDLE
+docker pull --platform=arm64 $PLURAL_IMAGES_BUNDLE
 docker save $PLURAL_IMAGES_BUNDLE -o $BUNDLES_DIRECTORY/plural-images-bundle.tar
 
 ### END PLURAL CUSTOMIZATION ###
