@@ -41,34 +41,17 @@ fi
 echo "Creating build directory..."
 mkdir -p build
 
-echo "Preparing image..."
+echo "Building image..."
 curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/prepare-image.sh -o prepare-image.sh
 chmod +x prepare-image.sh
-mkdir -p image
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$PWD"/image:/image \
+  -v "$PWD"/build:/tmp/build \
+  -v "$PWD"/cloud-config.yaml:/cloud-config.yaml \
   -v "$PWD"/prepare-image.sh:/prepare-image.sh \
   -e IMAGE=$IMAGE \
   --privileged -ti --rm \
   --entrypoint=/prepare-image.sh quay.io/kairos/auroraboot:v0.4.3
-
-echo "Building image..."
-mkdir -p build
-docker run \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$PWD"/build:/tmp/build \
-  -v "$PWD"/image:/tmp/image \
-  -v "$PWD"/cloud-config.yaml:/cloud-config.yaml \
-  --privileged -ti --rm \
-  --entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
-  --model rpi4 \
-  --state-partition-size 6200 \
-  --recovery-partition-size 4200 \
-  --size 15200 \
-  --images-size 2000 \
-  --directory /tmp/image \
-  --config /cloud-config.yaml /tmp/build/kairos.img
 
 echo "Successfully generated image and saved it to build directory.
 Now you can flash your storage device and conect it to your Raspberry Pi 4.
