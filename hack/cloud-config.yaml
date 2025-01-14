@@ -4,6 +4,14 @@ users:
   - name: "kairos"
     passwd: @PASSWORD@
     groups: [ "admin" ]
+
+write_files:
+  - path: /etc/rancher/k3s/registries.yaml
+    permissions: "0644"
+    content: |
+      mirrors:
+        "*":  
+
 k3s:
   enabled: true
   replace_args: true
