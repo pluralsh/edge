@@ -13,10 +13,10 @@ k3s:
     - --disable=traefik,servicelb
 bundles:
   - targets:
-      - run:///run/initramfs/live/plural-bundle.tar
+      - run:///usr/local/bundles/plural-bundle.tar
     local_file: true
   - targets:
-      - run:///run/initramfs/live/plural-images-bundle.tar
+      - run:///usr/local/bundles/plural-images-bundle.tar
     local_file: true
 plural:
   token: @TOKEN@
