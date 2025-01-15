@@ -13,6 +13,7 @@ getConfig() {
     echo
 }
 
+CERT_MANAGER_VERSION="v1.16.2"
 VERSION="v0.15.0"
 
 templ() {
@@ -23,6 +24,11 @@ templ() {
 }
 
 readConfig() {
+    _certManagerVersion=$(getConfig plural.certManagerVersion)
+    if [ "$_certManagerVersion" != "" ]; then
+        CERT_MANAGER_VERSION=$_certManagerVersion
+    fi
+
     _version=$(getConfig plural.trustManagerVersion)
     if [ "$_version" != "" ]; then
         VERSION=$_version
@@ -35,6 +41,7 @@ readConfig
 
 # Copy manifests, and template them
 for FILE in assets/*; do
+  templ "CERT_MANAGER_VERSION" "${CERT_MANAGER_VERSION}" "${FILE}"
   templ "VERSION" "${VERSION}" "${FILE}"
 done;
 
