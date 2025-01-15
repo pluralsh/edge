@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: trust-manager
+  namespace: cert-manager
+spec:
+  chart: trust-manager
+  repo: https://charts.jetstack.io
+  version: "@VERSION@"
