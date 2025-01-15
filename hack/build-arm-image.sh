@@ -465,8 +465,9 @@ grub2-editenv $WORKDIR/state/grub_oem_env set "default_menu_entry=$menu_entry"
 # We copy the file we saved earier to the STATE partition
 cp -rfv "${tmpgrubconfig}" $WORKDIR/state/grubmenu
 
-### PLURAL CUSTOMIZATION ###
-
+##############################################################################################
+#################################### PLURAL CUSTOMIZATION ####################################
+##############################################################################################
 BUNDLES_DIRECTORY=$WORKDIR/state/plural/bundles
 echo "Preparing $BUNDLES_DIRECTORY..."
 mkdir -p $BUNDLES_DIRECTORY
@@ -481,7 +482,13 @@ echo "Adding $PLURAL_IMAGES_BUNDLE bundle..."
 docker pull --platform=arm64 $PLURAL_IMAGES_BUNDLE
 docker save $PLURAL_IMAGES_BUNDLE -o $BUNDLES_DIRECTORY/plural-images-bundle.tar
 
-### END PLURAL CUSTOMIZATION ###
+PLURAL_TRUST_MANAGER_BUNDLE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.0"
+echo "Adding $PLURAL_TRUST_MANAGER_BUNDLE bundle..."
+docker pull --platform=arm64 $PLURAL_TRUST_MANAGER_BUNDLE
+docker save $PLURAL_TRUST_MANAGER_BUNDLE -o $BUNDLES_DIRECTORY/plural-trust-manager-bundle.tar
+##############################################################################################
+################################## END PLURAL CUSTOMIZATION ##################################
+##############################################################################################
 
 # Copy over content
 cp -arf $EFI/* $WORKDIR/efi

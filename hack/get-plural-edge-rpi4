@@ -42,7 +42,6 @@ echo "Building image..."
 curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/build-arm-image.sh -o build-arm-image.sh
 chmod +x build-arm-image.sh
 mkdir -p build
-
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp/build \

@@ -28,6 +28,9 @@ bundles:
   - targets:
       - run:///run/initramfs/cos-state/plural/bundles/plural-images-bundle.tar
     local_file: true
+  - targets:
+      - run:///run/initramfs/cos-state/plural/bundles/plural-trust-manager-bundle.tar
+    local_file: true
 
 plural:
   token: @TOKEN@
