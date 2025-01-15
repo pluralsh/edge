@@ -482,7 +482,7 @@ echo "Adding $PLURAL_IMAGES_BUNDLE bundle..."
 docker pull --platform=arm64 $PLURAL_IMAGES_BUNDLE
 docker save $PLURAL_IMAGES_BUNDLE -o $BUNDLES_DIRECTORY/plural-images-bundle.tar
 
-PLURAL_TRUST_MANAGER_BUNDLE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.0"
+PLURAL_TRUST_MANAGER_BUNDLE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.1.0"
 echo "Adding $PLURAL_TRUST_MANAGER_BUNDLE bundle..."
 docker pull --platform=arm64 $PLURAL_TRUST_MANAGER_BUNDLE
 docker save $PLURAL_TRUST_MANAGER_BUNDLE -o $BUNDLES_DIRECTORY/plural-trust-manager-bundle.tar
