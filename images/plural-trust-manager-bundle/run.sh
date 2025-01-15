@@ -4,6 +4,10 @@ set -ex
 
 K3S_MANIFEST_DIR=${K3S_MANIFEST_DIR:-/var/lib/rancher/k3s/server/manifests/}
 
+CERT_MANAGER_VERSION="v1.16.2"
+
+VERSION="v0.15.0"
+
 getConfig() {
     local l=$1
     key=$(kairos-agent config get "${l}" | tr -d '\n')
@@ -12,9 +16,6 @@ getConfig() {
     fi
     echo
 }
-
-CERT_MANAGER_VERSION="v1.16.2"
-VERSION="v0.15.0"
 
 templ() {
     local file="$3"
@@ -45,4 +46,4 @@ for FILE in assets/*; do
   templ "VERSION" "${VERSION}" "${FILE}"
 done;
 
-cp -rf assets/* "${K3S_MANIFEST_DIR}"
+cp -rfv assets/* "${K3S_MANIFEST_DIR}"
