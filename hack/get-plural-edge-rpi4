@@ -20,7 +20,7 @@ templ() {
 }
 
 if [ -f $CLOUD_CONFIG ]; then
-  read -p "$CLOUD_CONFIG already exists. Would you like to skip templating and use it? (y/n) " -r SKIP_TEMPLATING
+  read -p "${CLOUD_CONFIG} already exists. Would you like to skip templating and use it? (y/n) " -r SKIP_TEMPLATING
 fi
 if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
   read -p "Enter your Plural Console URL: " -r URL
@@ -29,11 +29,11 @@ if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
   read -p "Enter password for kairos user: " -rs PASSWORD
   echo -e ""
 
-  echo "Preparing cloud-config.yaml..."
-  curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o cloud-config.yaml
-  templ "URL" "${URL}" cloud-config.yaml
-  templ "TOKEN" "${TOKEN}" cloud-config.yaml
-  templ "PASSWORD" "${PASSWORD}" cloud-config.yaml
+  echo "Preparing ${CLOUD_CONFIG}..."
+  curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o "${CLOUD_CONFIG}"
+  templ "URL" "${URL}" "${CLOUD_CONFIG}"
+  templ "TOKEN" "${TOKEN}" "${CLOUD_CONFIG}"
+  templ "PASSWORD" "${PASSWORD}" "${CLOUD_CONFIG}"
 fi
 
 echo "Building image..."
@@ -43,7 +43,7 @@ mkdir -p build
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp/build \
-  -v "$PWD"/cloud-config.yaml:/cloud-config.yaml \
+  -v "$PWD"/"$CLOUD_CONFIG":/cloud-config.yaml \
   -v "$PWD"/build-arm-image.sh:/build-arm-image.sh \
   --privileged -ti --rm \
   --entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
