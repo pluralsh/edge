@@ -12,6 +12,9 @@ spec:
   chart: cert-manager
   repo: https://charts.jetstack.io
   version: "@CERT_MANAGER_VERSION@"
+  valuesContent: |-
+    crds:
+      enabled: true
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
