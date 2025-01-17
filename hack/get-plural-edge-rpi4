@@ -26,13 +26,15 @@ if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
   read -p "Enter your Plural Console URL: " -r URL
   read -p "Enter your Plural Console token: " -rs TOKEN
   echo -e ""
-  read -p "Enter password for kairos user: " -rs PASSWORD
+  read -p "Enter name for initial user account: " -r USERNAME
+  read -p "Enter password for initial user account: " -rs PASSWORD
   echo -e ""
 
   echo "Preparing ${CLOUD_CONFIG}..."
   curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/cloud-config.yaml -o "${CLOUD_CONFIG}"
   templ "URL" "${URL}" "${CLOUD_CONFIG}"
   templ "TOKEN" "${TOKEN}" "${CLOUD_CONFIG}"
+  templ "USERNAME" "${USERNAME}" "${CLOUD_CONFIG}"
   templ "PASSWORD" "${PASSWORD}" "${CLOUD_CONFIG}"
 fi
 

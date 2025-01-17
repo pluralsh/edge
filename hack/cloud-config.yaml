@@ -2,7 +2,7 @@
 hostname: plural-edge-{{ trunc 10 .MachineID }}
 
 users:
-  - name: "kairos"
+  - name: @USERNAME@
     passwd: @PASSWORD@
     groups: [ "admin" ]
 
