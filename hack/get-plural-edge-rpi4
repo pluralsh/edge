@@ -2,6 +2,13 @@
 
 set -e
 
+function cleanup {
+  echo "Removing volume"
+  docker volume rm edge-rootfs
+}
+
+trap cleanup EXIT
+
 IMAGE=quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
 CLOUD_CONFIG=cloud-config.yaml
 SKIP_TEMPLATING=n
@@ -38,19 +45,39 @@ if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
   templ "PASSWORD" "${PASSWORD}" "${CLOUD_CONFIG}"
 fi
 
+docker volume create edge-rootfs
+
+docker run -ti --rm --user root \
+  --mount source=edge-rootfs,target=/rootfs \
+  gcr.io/go-containerregistry/crane:latest \
+  --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-bundle:0.1.4 /rootfs/plural-bundle.tar
+
+docker run -ti --rm --user root \
+  --mount source=edge-rootfs,target=/rootfs \
+  gcr.io/go-containerregistry/crane:latest \
+  --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.2 /rootfs/plural-images-bundle.tar
+
+docker run -ti --rm --user root \
+  --mount source=edge-rootfs,target=/rootfs \
+  gcr.io/go-containerregistry/crane:latest \
+  --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.1.0 /rootfs/plural-trust-manager-bundle.tar
+
+docker run -ti --rm --privileged\
+  --mount source=edge-rootfs,target=/rootfs \
+  quay.io/luet/base \
+  util unpack ${IMAGE} /rootfs
+
 echo "Building image..."
-curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/hack/build-arm-image.sh -o build-arm-image.sh
-chmod +x build-arm-image.sh
 mkdir -p build
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp/build \
   -v "$PWD"/"$CLOUD_CONFIG":/cloud-config.yaml \
-  -v "$PWD"/build-arm-image.sh:/build-arm-image.sh \
+  --mount source=edge-rootfs,target=/rootfs \
   --privileged -ti --rm \
   --entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
   --model rpi4 \
-  --docker-image "${IMAGE}" \
+  --directory /rootfs \
   --config /cloud-config.yaml /tmp/build/kairos.img
 echo "Successfully built image and saved it to the build directory!"
 
