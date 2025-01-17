@@ -1,0 +1,4 @@
+bundles:
+  plural-bundle: ghcr.io/pluralsh/kairos-plural-bundle:0.1.4
+  plural-images-bundle: ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.2
+  plural-trust-manager-bundle: ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.1.0
