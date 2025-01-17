@@ -5,9 +5,10 @@ set -e
 TARGETARCH=$1
 
 IMAGES=(
-pluralsh/kairos-plural-cli:0.11.1
-pluralsh/deployment-operator:0.5.6
-pluralsh/agentk:0.0.2
+ghcr.io/pluralsh/kairos-plural-cli:0.11.1
+ghcr.io/pluralsh/deployment-operator:0.5.6
+ghcr.io/pluralsh/agentk:0.0.2
+alpine/curl:8.10.0
 )
 
 echo "Using $TARGETARCH architecture"
