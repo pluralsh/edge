@@ -1,5 +1,5 @@
 #cloud-config
-hostname: plural-edge-{{ trunc 10 .MachineID }}
+hostname: plural-{{ trunc 10 .MachineID }}
 
 users:
   - name: @USERNAME@
@@ -17,7 +17,7 @@ k3s:
   enabled: true
   replace_args: true
   args:
-    - --node-name=plural
+    - --node-name=plural-{{ trunc 10 .MachineID }}
     - --embedded-registry
     - --disable=traefik,servicelb
 
