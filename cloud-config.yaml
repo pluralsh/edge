@@ -11,7 +11,10 @@ write_files:
     permissions: "0644"
     content: |
       mirrors:
-        "*":  
+        "*":
+  - path: /etc/plural-id
+    permissions: "0644"
+    content: {{ uuidv4 }}
 
 k3s:
   enabled: true
