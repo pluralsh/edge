@@ -17,7 +17,7 @@ k3s:
   enabled: true
   replace_args: true
   args:
-    - --node-name=kairos
+    - --node-name=plural
     - --embedded-registry
     - --disable=traefik,servicelb
 
