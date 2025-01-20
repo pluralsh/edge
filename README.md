@@ -14,17 +14,11 @@ Get Plural running on your edge devices.
 - `kairos-plural-images-bundle` — contains bundled container images to speed up initial device boot (optional).
 - `kairos-plural-trust-manager-bundle` — installs cert-manager and trust-manager in the k3s cluster (optional).
 
-## Setup on Raspberry Pi 4
+## Setup
 
-The general process of setting up your Raspberry Pi 4 is pretty straightforward,
-and it can be started with the following command:
+The general process of setting up your edge device is pretty straightforward,
+and it can be done with Plural CLI ([quickstart docs](https://docs.plural.sh/deployments/cli-quickstart)):
 
 ```bash
-curl -fsSL -o get-plural-edge-rpi4 https://raw.githubusercontent.com/pluralsh/edge/main/get-plural-edge-rpi4
-chmod 700 get-plural-edge-rpi4
-./get-plural-edge-rpi4
+plural edge image
 ```
-
-We recommend running it from an empty directory.
-
-The current setup assumes that Raspberry Pi is connected to the network via Ethernet cable.
