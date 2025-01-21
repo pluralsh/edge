@@ -30,7 +30,7 @@ k3s:
   enabled: true
   replace_args: true
   args:
-    - --node-name=plural-{{ trunc 10 .MachineID }}
+    - --node-name=plural
     - --embedded-registry
     - --disable=traefik,servicelb
 
