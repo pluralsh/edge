@@ -12,11 +12,10 @@ write_files:
     content: |
       mirrors:
         "*":
-# TODO: Enable once it will be fixed.
-#  - path: /etc/plural-id
-#    permissions: "0644"
-#    content: |
-#      {{ uuidv4 }}
+  - path: /etc/plural-id
+    permissions: "0644"
+    content: |
+      {{ uuidv4 }}
 
 k3s:
   enabled: true
