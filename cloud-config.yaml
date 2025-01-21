@@ -1,5 +1,5 @@
 #cloud-config
-hostname: plural-edge-{{ trunc 10 .MachineID }}
+hostname: plural-{{ trunc 10 .MachineID }}
 
 users:
   - name: @USERNAME@
@@ -20,13 +20,18 @@ write_files:
     permissions: "0644"
     content: |
       mirrors:
-        "*":  
+        "*":
+# TODO: Enable once it will be fixed.
+#  - path: /etc/plural-id
+#    permissions: "0644"
+#    content: |
+#      {{ uuidv4 }}
 
 k3s:
   enabled: true
   replace_args: true
   args:
-    - --node-name=kairos
+    - --node-name=plural-{{ trunc 10 .MachineID }}
     - --embedded-registry
     - --disable=traefik,servicelb
 

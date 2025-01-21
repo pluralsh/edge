@@ -70,7 +70,7 @@ for FILE in assets/*; do
   templ "BASE_IMAGE" "${BASE_IMAGE}" "${FILE}"
   templ "TOKEN" "${TOKEN}" "${FILE}"
   templ "URL" "${URL}" "${FILE}"
-  templ "CLUSTER_NAME" "${CLUSTER_NAME_PREFIX}-$(cut -c1-10 < /etc/machine-id)" "${FILE}"
+  templ "CLUSTER_NAME" "${CLUSTER_NAME_PREFIX}-$(cut -c1-10 < /etc/plural-id)" "${FILE}"
   templ "PROJECT" "${PROJECT}" "${FILE}"
   templ "TAG" "${TAG}" "${FILE}"
 done;
