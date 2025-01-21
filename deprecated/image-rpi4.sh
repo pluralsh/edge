@@ -36,32 +36,36 @@ if [ "$SKIP_TEMPLATING" == "${SKIP_TEMPLATING#[Yy]}" ] ;then
   read -p "Enter name for initial user account: " -r USERNAME
   read -p "Enter password for initial user account: " -rs PASSWORD
   echo -e ""
-
+  read -p "Enter name for initial WIFI SSID: " -r WIFISSID
+  read -p "Enter password for initial WIFI password: " -rs WIFIPASSWORD
+  echo -e ""
   echo "Preparing ${CLOUD_CONFIG}..."
   curl --silent https://raw.githubusercontent.com/pluralsh/edge/main/cloud-config.yaml -o "${CLOUD_CONFIG}"
   templ "URL" "${URL}" "${CLOUD_CONFIG}"
   templ "TOKEN" "${TOKEN}" "${CLOUD_CONFIG}"
   templ "USERNAME" "${USERNAME}" "${CLOUD_CONFIG}"
   templ "PASSWORD" "${PASSWORD}" "${CLOUD_CONFIG}"
+  templ "WIFISSID" "${WIFISSID}" "${CLOUD_CONFIG}"
+  templ "WIFIPASSWORD" "${WIFIPASSWORD}" "${CLOUD_CONFIG}"
 fi
 
 docker volume create edge-rootfs
-
+echo "export image kairos-plural-bundle ..."
 docker run -ti --rm --user root \
   --mount source=edge-rootfs,target=/rootfs \
   gcr.io/go-containerregistry/crane:latest \
   --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-bundle:0.1.4 /rootfs/plural-bundle.tar
-
+echo "export image kairos-plural-images-bundle ..."
 docker run -ti --rm --user root \
   --mount source=edge-rootfs,target=/rootfs \
   gcr.io/go-containerregistry/crane:latest \
   --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.2 /rootfs/plural-images-bundle.tar
-
+echo "export image kairos-plural-trust-manager-bundle ..."
 docker run -ti --rm --user root \
   --mount source=edge-rootfs,target=/rootfs \
   gcr.io/go-containerregistry/crane:latest \
   --platform=linux/arm64 pull ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.1.0 /rootfs/plural-trust-manager-bundle.tar
-
+echo "unpack image $IMAGE ..."
 docker run -ti --rm --privileged\
   --mount source=edge-rootfs,target=/rootfs \
   quay.io/luet/base \
