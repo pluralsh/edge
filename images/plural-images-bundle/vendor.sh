@@ -4,6 +4,7 @@ set -e
 
 TARGETARCH=$1
 
+# TODO: Write renovate config to keep it up to date.
 IMAGES=(
 ghcr.io/pluralsh/kairos-plural-cli:0.11.1
 ghcr.io/pluralsh/deployment-operator:0.5.6
