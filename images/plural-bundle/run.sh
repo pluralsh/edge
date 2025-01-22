@@ -5,7 +5,7 @@ set -ex
 K3S_MANIFEST_DIR=${K3S_MANIFEST_DIR:-/var/lib/rancher/k3s/server/manifests/}
 
 # renovate: datasource=docker depName=ghcr.io/pluralsh/plural-cli-cloud
-BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:bootstrap" # TODO: Revert once https://github.com/pluralsh/plural-cli/pull/598 will be merged.
+BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:bootstrap"
 TOKEN=""
 URL=""
 
