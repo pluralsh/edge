@@ -1,4 +1,4 @@
-FROM alpine AS build
+FROM alpine:3.21.2 AS build
 
 ARG TARGETARCH
 
