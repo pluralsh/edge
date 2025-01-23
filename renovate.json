@@ -16,6 +16,14 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Update image versions in vendor script",
+      "fileMatch": [".*vendor\\.sh"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s[a-zA-Z\\.\\/\\-]+?:(?<currentValue>.+?)\\s"
+      ]
     }
   ]
 }
