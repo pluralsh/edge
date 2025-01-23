@@ -19,10 +19,18 @@
     },
     {
       "customType": "regex",
-      "description": "Update image versions in vendor script",
+      "description": "Update image versions in vendor.sh",
       "fileMatch": [".*vendor\\.sh"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s[a-zA-Z\\.\\/\\-]+?:(?<currentValue>.+?)\\s"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Update image versions in plural-config.yaml",
+      "fileMatch": ["plural-config\\.yaml"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s+[a-zA-Z\\.\\/\\-]+?:\\s[a-zA-Z\\.\\/\\-]+?:(?<currentValue>.+?)\\s"
       ]
     }
   ]
