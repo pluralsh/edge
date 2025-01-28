@@ -12,7 +12,7 @@ ghcr.io/pluralsh/deployment-operator:0.5.7
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/agentk versioning=docker
 ghcr.io/pluralsh/agentk:0.0.2
 # renovate: datasource=docker packageName=alpine/curl versioning=docker
-alpine/curl:8.10.0
+alpine/curl:8.11.1
 )
 
 echo "Using $TARGETARCH architecture"
