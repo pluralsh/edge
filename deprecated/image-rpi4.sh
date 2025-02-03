@@ -5,6 +5,7 @@ set -e
 function cleanup {
   echo "Removing volume"
   docker volume rm edge-rootfs
+  rm defaults.yaml
 }
 
 trap cleanup EXIT
@@ -71,12 +72,16 @@ docker run -ti --rm --privileged\
   quay.io/luet/base \
   util unpack ${IMAGE} /rootfs
 
+
+echo '#cloud-config' >> defaults.yaml
+
 echo "Building image..."
 mkdir -p build
 docker run \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD"/build:/tmp/build \
   -v "$PWD"/"$CLOUD_CONFIG":/cloud-config.yaml \
+  -v "$PWD"/defaults.yaml:/defaults.yaml \
   --mount source=edge-rootfs,target=/rootfs \
   --privileged -ti --rm \
   --entrypoint=/build-arm-image.sh quay.io/kairos/auroraboot:v0.4.3 \
