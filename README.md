@@ -20,5 +20,8 @@ The general process of setting up your edge device is pretty straightforward,
 and it can be done with Plural CLI ([quickstart docs](https://docs.plural.sh/deployments/cli-quickstart)):
 
 ```bash
-plural edge image
+$ plural edge image
+$ sudo plural edge flash
 ```
+
+Use `-h` to check available arguments for both commands.

@@ -4,8 +4,8 @@ aurorabootImage: quay.io/kairos/auroraboot:v0.4.3
 craneImage: gcr.io/go-containerregistry/crane:latest
 bundles:
   # renovate: datasource=docker packageName=ghcr.io/pluralsh/kairos-plural-bundle versioning=docker
-  plural-bundle: ghcr.io/pluralsh/kairos-plural-bundle:0.1.6
+  plural-bundle: ghcr.io/pluralsh/kairos-plural-bundle:1.0.0
   # renovate: datasource=docker packageName=ghcr.io/pluralsh/kairos-plural-images-bundle versioning=docker
-  plural-images-bundle: ghcr.io/pluralsh/kairos-plural-images-bundle:0.1.2
+  plural-images-bundle: ghcr.io/pluralsh/kairos-plural-images-bundle:1.0.0
   # renovate: datasource=docker packageName=ghcr.io/pluralsh/kairos-plural-trust-manager-bundle versioning=docker
-  plural-trust-manager-bundle: ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.1.0
+  plural-trust-manager-bundle: ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.2.0
