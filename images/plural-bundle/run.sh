@@ -5,7 +5,7 @@ set -ex
 K3S_MANIFEST_DIR=${K3S_MANIFEST_DIR:-/var/lib/rancher/k3s/server/manifests/}
 
 # TODO: Write renovate config to keep it up to date.
-BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:bootstrap"
+BASE_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:0.12.0"
 TOKEN=""
 URL=""
 
