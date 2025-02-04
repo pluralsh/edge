@@ -6,7 +6,7 @@ TARGETARCH=$1
 
 IMAGES=(
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/kairos-plural-cli versioning=docker
-ghcr.io/pluralsh/kairos-plural-cli:0.11.2
+ghcr.io/pluralsh/kairos-plural-cli:0.12.0
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/deployment-operator versioning=docker
 ghcr.io/pluralsh/deployment-operator:0.5.9
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/agentk versioning=docker
