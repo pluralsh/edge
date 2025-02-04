@@ -27,7 +27,7 @@ spec:
     spec:
       initContainers:
         - name: wait-for-k8s-api
-          image: alpine/curl:8.10.0
+          image: alpine/curl:8.11.1
           command:
             - /bin/sh
             - -c
