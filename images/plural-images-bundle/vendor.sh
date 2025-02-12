@@ -10,7 +10,7 @@ ghcr.io/pluralsh/kairos-plural-cli:0.12.0
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/deployment-operator versioning=docker
 ghcr.io/pluralsh/deployment-operator:0.5.12
 # renovate: datasource=docker packageName=ghcr.io/pluralsh/agentk versioning=docker
-ghcr.io/pluralsh/agentk:0.0.2
+ghcr.io/pluralsh/agentk:0.1.0
 # renovate: datasource=docker packageName=alpine/curl versioning=docker
 alpine/curl:8.11.1
 )
