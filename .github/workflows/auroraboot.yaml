@@ -55,7 +55,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: "."
+          context: "rpi5"
           file: "rpi5/Dockerfile"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
