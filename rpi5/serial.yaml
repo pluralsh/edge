@@ -1,0 +1,4 @@
+#cloud-config
+runcmd:
+  - if [ ! -e /dev/ttyS0 ]; then ln -s /dev/ttyAMA10 /dev/ttyS0; fi
+
