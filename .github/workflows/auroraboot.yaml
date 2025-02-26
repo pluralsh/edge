@@ -16,7 +16,7 @@ env:
 jobs:
   publish:
     name: Build and push auroraboot image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: 'read'
       id-token: 'write'
