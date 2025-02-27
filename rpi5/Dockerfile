@@ -1,4 +1,4 @@
-FROM quay.io/kairos/auroraboot:v0.4.3
+FROM quay.io/kairos/auroraboot:v0.5.0
 
 WORKDIR /
 
