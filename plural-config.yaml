@@ -1,5 +1,5 @@
 image: quay.io/kairos/alpine:3.19-standard-arm64-rpi4-v3.2.4-k3sv1.31.3-k3s1
-# renovate: datasource=docker packageName=quay.io/kairos/auroraboot versioning=docker
+# renovate: datasource=docker packageName=ghcr.io/pluralsh/auroraboot versioning=docker
 aurorabootImage: ghcr.io/pluralsh/auroraboot:v0.4.3
 craneImage: gcr.io/go-containerregistry/crane:latest
 bundles:
