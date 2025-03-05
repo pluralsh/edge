@@ -35,6 +35,8 @@ bundles:
   - targets:
       - run:///plural-trust-manager-bundle.tar
     local_file: true
+  - targets:
+      - run://quay.io/kairos/community-bundles:system-upgrade-controller_latest
 
 plural:
   token: @TOKEN@
