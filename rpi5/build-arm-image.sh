@@ -8,6 +8,7 @@ load_vars() {
 
   model=${MODEL:-odroid_c2}
   directory=${DIRECTORY:-}
+  setup_script=${SETUP_SCRIPT:-}
   output_image="${OUTPUT_IMAGE:-arm.img}"
   # Img creation options. Size is in MB for all of the vars below
   size="${SIZE:-7608}"
@@ -106,6 +107,7 @@ usage()
     echo " --images-size: (optional) Size of the active/passive/recovery images (MB)"
     echo " --docker-image: (optional) A container image which will be used for active/passive/recovery system"
     echo " --directory: (optional) A directory which will be used for active/passive/recovery system"
+    echo " --setup-script: (optional) A path to the script that can access unpacked root filesystem of the target image. Can be used to modify i.e. /boot/config.txt file."
     echo " --model: (optional) The board model"
     echo " --efi-dir: (optional) A directory with files which will be added to the efi partition"
     exit 1
@@ -174,6 +176,10 @@ while [ "$#" -gt 0 ]; do
         --directory)
             shift 1
             directory=$1
+            ;;
+        --setup_script)
+            shift 1
+            setup_script=$1
             ;;
         --model)
             shift 1
@@ -293,6 +299,11 @@ fi
 # This is a hack and we need a better way: https://github.com/kairos-io/kairos/issues/1427
 tmpgrubconfig=$(mktemp /tmp/grubmeny.cfg.XXXXXX)
 cp -rfv $TARGET/etc/kairos/branding/grubmenu.cfg "${tmpgrubconfig}"
+
+if [ -n "${setup_script}" ]; then
+  echo ">> Executing a custom script at: ${setup_script}"
+  sh -c "${setup_script}" "${TARGET}"
+fi
 
 umount $TARGET
 sync
