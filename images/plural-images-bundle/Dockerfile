@@ -1,4 +1,4 @@
-FROM quay.io/skopeo/stable:v1.17 AS builder
+FROM quay.io/skopeo/stable:v1.18 AS builder
 
 ARG TARGETARCH
 
