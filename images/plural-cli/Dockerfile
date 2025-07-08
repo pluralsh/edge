@@ -8,7 +8,7 @@ ADD "https://github.com/pluralsh/plural-cli/releases/download/v${PLURAL_VERSION}
 RUN tar -xzvf /plural-cli_${PLURAL_VERSION}_Linux_${TARGETARCH}.tar.gz plural
 
 # renovate: datasource=github-releases depName=helm packageName=helm/helm versioning=loose
-ENV HELM_VERSION=v3.17.3
+ENV HELM_VERSION=v3.18.3
 ADD "https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" /
 RUN tar -xzvf /helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz linux-${TARGETARCH}/helm
 
