@@ -1,6 +1,7 @@
 # Build artifacts
 build
 image
+hack/k3s/assets
 
 # IDE files
 /.idea
