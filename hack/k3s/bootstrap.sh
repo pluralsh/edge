@@ -29,10 +29,98 @@ K3S_VERSION=${K3S_VERSION:-"1.32.0"}
 ARCH=$(current_arch)
 
 # Bundle images configuration
-K3S_BUNDLE_IMAGE="ghcr.io/pluralsh/k3s-bundle:${K3S_VERSION}"
+K3S_BUNDLE_IMAGE="docker.io/floreks/k3s-bundle:${K3S_VERSION}" # TODO: change to pluralsh
 PLURAL_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-bundle:1.0.0"
 PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.2.0"
 PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:1.0.0"
+
+check_system_requirements() {
+    echo "Checking system requirements for K3s..."
+
+    # Check if running as root or with sudo
+    if [ "$(id -u)" -ne 0 ] && ! sudo -n true 2>/dev/null; then
+        echo "Error: This script requires root privileges or passwordless sudo"
+        exit 1
+    fi
+
+    # Check cgroups v1 or v2 availability
+    if [ ! -d "/sys/fs/cgroup" ]; then
+        echo "Error: cgroups not available - /sys/fs/cgroup not found"
+        exit 1
+    fi
+
+    # Check cgroup version and required controllers
+    if [ -f "/sys/fs/cgroup/cgroup.controllers" ]; then
+        echo "Found cgroups v2"
+        cgroup_version="v2"
+
+        # Check if memory controller is available in cgroups v2
+        if ! grep -q "memory" /sys/fs/cgroup/cgroup.controllers 2>/dev/null; then
+            echo "Error: memory controller not available in cgroups v2"
+            echo "Available controllers: $(cat /sys/fs/cgroup/cgroup.controllers 2>/dev/null || echo 'none')"
+            exit 1
+        fi
+
+        # Check if cpu controller is available in cgroups v2
+        if ! grep -q "cpu" /sys/fs/cgroup/cgroup.controllers 2>/dev/null; then
+            echo "Error: cpu controller not available in cgroups v2"
+            exit 1
+        fi
+
+        # Check if pids controller is available in cgroups v2
+        if ! grep -q "pids" /sys/fs/cgroup/cgroup.controllers 2>/dev/null; then
+            echo "Warning: pids controller not available in cgroups v2"
+        fi
+
+    elif [ -d "/sys/fs/cgroup/memory" ] && [ -d "/sys/fs/cgroup/cpu" ]; then
+        echo "Found cgroups v1"
+        cgroup_version="v1"
+
+        # Check if memory cgroup is properly mounted and accessible
+        if [ ! -f "/sys/fs/cgroup/memory/memory.limit_in_bytes" ]; then
+            echo "Error: memory cgroup not properly configured in cgroups v1"
+            exit 1
+        fi
+
+        # Check if cpu cgroup is properly mounted and accessible
+        if [ ! -f "/sys/fs/cgroup/cpu/cpu.shares" ]; then
+            echo "Error: cpu cgroup not properly configured in cgroups v1"
+            exit 1
+        fi
+
+    else
+        echo "Error: Neither cgroups v1 nor v2 properly configured"
+        echo "Available cgroup mounts:"
+        mount | grep cgroup || echo "No cgroup mounts found"
+        exit 1
+    fi
+
+    # Check systemd availability
+    if ! command -v systemctl >/dev/null 2>&1; then
+        echo "Warning: systemd not found - K3s will run without systemd service"
+    fi
+
+    # Check kernel version (K3s requires 3.10+)
+    kernel_version=$(uname -r | cut -d. -f1-2)
+    if [ "$(printf '%s\n' "3.10" "${kernel_version}" | sort -V | head -n1)" != "3.10" ]; then
+        echo "Error: Kernel version ${kernel_version} is too old. K3s requires 3.10+"
+        exit 1
+    fi
+
+    # Check available disk space (minimum 1GB)
+    available_space=$(df /var/lib 2>/dev/null | awk 'NR==2 {print $4}' || echo "0")
+    if [ "${available_space}" -lt 1048576 ]; then  # 1GB in KB
+        echo "Warning: Less than 1GB available space in /var/lib"
+    fi
+
+    # Check if iptables is available
+    if ! command -v iptables >/dev/null 2>&1; then
+        echo "Error: iptables not found - required for K3s networking"
+        exit 1
+    fi
+
+    echo "System requirements check passed (cgroups: ${cgroup_version})"
+}
 
 download_assets_from_oci() {
     oci_image="${1}"
@@ -141,6 +229,8 @@ vendor_k3s() {
         echo "Some K3s assets are missing, downloading..."
         download_assets_from_oci "${K3S_BUNDLE_IMAGE}" "${K3S_ASSETS_DIR}"
     fi
+
+    echo "K3s assets are ready in ${K3S_ASSETS_DIR}"
 }
 
 install_k3s() {
@@ -164,7 +254,7 @@ install_k3s() {
     sudo chmod +x /usr/local/bin/k3s
 
     # Setup K3s directories
-    sudo mkdir -p "${LOCAL_IMAGES_DIR}"
+    sudo mkdir -p "${K3S_LOCAL_IMAGES_DIR}"
 
     # Handle airgap images
     sudo cp "${K3S_ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" "${K3S_LOCAL_IMAGES_DIR}/"
@@ -178,7 +268,6 @@ install_k3s() {
     export INSTALL_K3S_EXEC="--node-name=plural --embedded-registry --disable=traefik,servicelb"
     export K3S_KUBECONFIG_MODE="644"
 
-    echo "Installing K3s..."
     sudo -E /tmp/install.sh
 
     # Cleanup
@@ -208,6 +297,9 @@ install_k3s() {
     echo "K3s installation complete!"
     echo "Kubeconfig: /etc/rancher/k3s/k3s.yaml"
 }
+
+# Check system requirements first
+check_system_requirements
 
 # Vendor assets if needed
 vendor k3s
