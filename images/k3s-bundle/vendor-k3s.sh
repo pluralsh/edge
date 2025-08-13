@@ -60,9 +60,9 @@ mkdir -p "${OUTPUT_DIR}"
 # Download K3s binary
 K3S_BINARY_NAME=$(k3s::binary::name "${ARCH}")
 echo "Downloading K3s binary..."
-wget -O "${OUTPUT_DIR}/${K3S_BINARY_NAME}" \
+wget -O "${OUTPUT_DIR}/k3s" \
     "https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/${K3S_BINARY_NAME}"
-chmod +x "${OUTPUT_DIR}/${K3S_BINARY_NAME}"
+chmod +x "${OUTPUT_DIR}/k3s"
 
 # Download K3s install script
 echo "Downloading K3s install script..."
@@ -71,7 +71,7 @@ chmod +x "${OUTPUT_DIR}/install.sh"
 
 # Download K3s airgap images
 echo "Downloading K3s airgap images..."
-wget -O "${OUTPUT_DIR}/k3s-airgap-images-${ARCH}.tar.gz" \
+wget -O "${OUTPUT_DIR}/k3s-airgap-images.tar.gz" \
     "https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s-airgap-images-${ARCH}.tar.gz"
 
 echo "K3s vendoring complete!"

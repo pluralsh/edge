@@ -2,18 +2,6 @@
 
 set -e
 
-current_arch() {
-    case "$(uname -m)" in
-        x86_64) echo "amd64" ;;
-        aarch64|arm64) echo "arm64" ;;
-        armv7l) echo "arm" ;;
-        *)
-          echo "unknown"
-          exit 1
-          ;;
-    esac
-}
-
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ASSETS_DIR="${SCRIPT_DIR}/assets"
@@ -25,14 +13,101 @@ PLURAL_TRUST_MANAGER_ASSETS_DIR="${ASSETS_DIR}/plural-trust-manager"
 
 # K3s configuration
 K3S_LOCAL_IMAGES_DIR="/var/lib/rancher/k3s/agent/images"
+K3S_MANIFESTS_DIR="/var/lib/rancher/k3s/server/manifests"
 K3S_VERSION=${K3S_VERSION:-"1.32.0"}
-ARCH=$(current_arch)
 
 # Bundle images configuration
 K3S_BUNDLE_IMAGE="docker.io/floreks/k3s-bundle:${K3S_VERSION}" # TODO: change to pluralsh
 PLURAL_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-bundle:1.0.0"
 PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.2.0"
 PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:1.0.0"
+
+# Plural configuration
+PLURAL_CLI_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:0.12.0"
+
+# Command line arguments
+TOKEN=""
+URL=""
+
+###############################################################################
+# Setup and utility functions
+###############################################################################
+usage() {
+    cat << EOF
+Usage: $0 [OPTIONS]
+
+Bootstrap script for K3s with Plural integration on edge devices.
+
+OPTIONS:
+    -t, --token TOKEN       Plural console authentication token (required)
+    -u, --url URL          Plural console URL (required)
+    -h, --help             Show this help message
+
+ENVIRONMENT VARIABLES:
+    K3S_VERSION            K3s version to install (default: 1.32.0)
+    BASE_IMAGE             Base image for templating
+
+EXAMPLES:
+    $0 --token "your-token" --url "console.onplural.sh"
+    $0 -t "your-token" -u "your-console.onplural.sh"
+
+EOF
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -t|--token)
+                TOKEN="$2"
+                shift 2
+                ;;
+            -u|--url)
+                URL="$2"
+                shift 2
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo "Error: Unknown option $1"
+                usage
+                exit 1
+                ;;
+        esac
+    done
+
+    # Validate required arguments
+    if [ -z "$TOKEN" ]; then
+        echo "Error: Token is required. Use -t or --token to specify."
+        usage
+        exit 1
+    fi
+
+    if [ -z "$URL" ]; then
+        echo "Error: URL is required. Use -u or --url to specify."
+        usage
+        exit 1
+    fi
+}
+
+templ() {
+    local file="$3"
+    local value="$2"
+    local sentinel="$1"
+    sed -i "s/@${sentinel}@/$(echo "${value}" | sed -e 's/[&\\/]/\\&/g; s/$/\\/' -e '$s/\\$//')/g" "${file}"
+}
+
+generate_uuid() {
+    if command -v uuidgen >/dev/null 2>&1; then
+        uuidgen
+    elif [ -r /proc/sys/kernel/random/uuid ]; then
+        cat /proc/sys/kernel/random/uuid
+    else
+        # Fallback: generate pseudo-random UUID
+        od -x /dev/urandom | head -1 | awk '{OFS="-"; print $2$3,$4,$5,$6,$7$8$9}'
+    fi
+}
 
 check_system_requirements() {
     echo "Checking system requirements for K3s..."
@@ -98,13 +173,6 @@ check_system_requirements() {
     # Check systemd availability
     if ! command -v systemctl >/dev/null 2>&1; then
         echo "Warning: systemd not found - K3s will run without systemd service"
-    fi
-
-    # Check kernel version (K3s requires 3.10+)
-    kernel_version=$(uname -r | cut -d. -f1-2)
-    if [ "$(printf '%s\n' "3.10" "${kernel_version}" | sort -V | head -n1)" != "3.10" ]; then
-        echo "Error: Kernel version ${kernel_version} is too old. K3s requires 3.10+"
-        exit 1
     fi
 
     # Check available disk space (minimum 1GB)
@@ -179,7 +247,6 @@ download_assets_from_oci() {
     echo "Assets downloaded successfully from OCI registry to ${assets_dir}"
 }
 
-# Function to check if asset exists locally
 check_local_asset() {
     asset_path="$1"
     if [ -f "${asset_path}" ]; then
@@ -191,6 +258,15 @@ check_local_asset() {
     fi
 }
 
+#############################################################################
+# Main functions
+#############################################################################
+
+# Vendor assets for K3s and Plural
+# Usage: vendor <target>
+# Targets:
+#   k3s     - Vendor K3s assets
+#   plural  - Vendor Plural assets
 vendor() {
     target="${1}"
 
@@ -203,6 +279,9 @@ vendor() {
         k3s)
             vendor_k3s
             ;;
+        plural)
+            vendor_plural
+            ;;
         *)
             echo "Unknown vendor target: ${target}"
             exit 1
@@ -210,14 +289,15 @@ vendor() {
     esac
 }
 
+# Downloads K3s assets from the specified OCI image if not present locally.
 vendor_k3s() {
     assets_missing=false
 
-    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s-${ARCH}" >/dev/null 2>&1; then
+    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s" >/dev/null 2>&1; then
         assets_missing=true
     fi
 
-    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" >/dev/null 2>&1; then
+    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s-airgap-images.tar.gz" >/dev/null 2>&1; then
         assets_missing=true
     fi
 
@@ -233,31 +313,36 @@ vendor_k3s() {
     echo "K3s assets are ready in ${K3S_ASSETS_DIR}"
 }
 
+# Vendors Plural assets, downloading from OCI if not present locally.
+vendor_plural() {
+    if ! check_local_asset "${PLURAL_ASSETS_DIR}/job.yaml" >/dev/null 2>&1; then
+        echo "Plural bundle asset not found, downloading..."
+        download_assets_from_oci "${PLURAL_BUNDLE_IMAGE}" "${PLURAL_ASSETS_DIR}"
+    fi
+
+    echo "Plural assets are ready in ${PLURAL_ASSETS_DIR}"
+}
+
+# Installs K3s with the specified version, using assets from the vendor directory.
 install_k3s() {
     k3s_version="${1}"
-    arch="${2}"
 
     if [ -z "${k3s_version}" ]; then
         echo "K3s version not specified"
         exit 1
     fi
 
-    if [ -z "${arch}" ]; then
-        echo "Architecture not specified"
-        exit 1
-    fi
-
-    echo "Installing K3s version ${k3s_version} for architecture ${arch}..."
+    echo "Installing K3s version ${k3s_version}..."
 
     # Install K3s binary
-    sudo cp "${K3S_ASSETS_DIR}/k3s-${ARCH}" /usr/local/bin/k3s
+    sudo cp "${K3S_ASSETS_DIR}/k3s" /usr/local/bin/k3s
     sudo chmod +x /usr/local/bin/k3s
 
     # Setup K3s directories
     sudo mkdir -p "${K3S_LOCAL_IMAGES_DIR}"
 
     # Handle airgap images
-    sudo cp "${K3S_ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" "${K3S_LOCAL_IMAGES_DIR}/"
+    sudo cp "${K3S_ASSETS_DIR}/k3s-airgap-images.tar.gz" "${K3S_LOCAL_IMAGES_DIR}/"
 
     # Get install script
     cp "${K3S_ASSETS_DIR}/install.sh" /tmp/install.sh
@@ -298,11 +383,56 @@ install_k3s() {
     echo "Kubeconfig: /etc/rancher/k3s/k3s.yaml"
 }
 
-# Check system requirements first
-check_system_requirements
+install_plural() {
+    echo "Setting up Plural..."
 
-# Vendor assets if needed
-vendor k3s
+    echo "Generating machine ID..."
+    uuid=$(generate_uuid)
+    echo "${uuid}" | sudo tee "/etc/plural-id" > /dev/null
 
-# Install K3s
-install_k3s "${K3S_VERSION}" "${ARCH}"
+    sudo mkdir -p "${K3S_MANIFESTS_DIR}"
+
+    echo "Templating Plural assets..."
+    for FILE in "${PLURAL_ASSETS_DIR}"/*; do
+      templ "BASE_IMAGE" "${PLURAL_CLI_IMAGE}" "${FILE}"
+      templ "TOKEN" "${TOKEN}" "${FILE}"
+      templ "URL" "${URL}" "${FILE}"
+      templ "MACHINE_ID" "$(cat /etc/plural-id)" "${FILE}"
+    done;
+
+    echo "Copying Plural manifests to K3s manifests directory..."
+    sudo cp -rfv "${PLURAL_ASSETS_DIR}"/* "${K3S_MANIFESTS_DIR}"
+
+    echo "Plural setup complete!"
+}
+
+###############################################################################
+# Main script execution
+###############################################################################
+main() {
+    # Parse command line arguments
+    parse_args "$@"
+
+    echo "Starting Plural bootstrap with:"
+    echo "  Token: $(echo "$TOKEN" | cut -c1-5)..."
+    echo "  URL: ${URL}"
+
+    # Check system requirements first
+    check_system_requirements
+
+    # Vendor assets if needed
+    vendor plural
+    vendor k3s
+
+    # Install K3s
+    install_plural
+    install_k3s "${K3S_VERSION}"
+
+    # Clean up assets directory
+    rm -rf "${ASSETS_DIR}"
+
+    echo "Bootstrap completed successfully!"
+}
+
+# Run the main function with all arguments
+main "$@"
