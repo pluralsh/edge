@@ -35,6 +35,7 @@ jobs:
             type=sha
             type=match,pattern=k3s-bundle/v(.*),group=1
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ github.event.inputs.version }},enable=${{ github.event.inputs.version != '' }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -51,7 +52,6 @@ jobs:
           username: mjgpluralsh
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
       - name: Build and push
-        # TODO: Do it on a job level once it will be possible.
         if: ${{ startsWith(github.ref, format('refs/tags/{0}', 'k3s-bundle')) || github.ref == 'refs/heads/main' || github.event.inputs.version }}
         uses: docker/build-push-action@v6
         with:
