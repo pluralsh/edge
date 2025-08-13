@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env sh
 
 set -e
 
@@ -15,7 +15,7 @@ current_arch() {
 }
 
 # Configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ASSETS_DIR="${SCRIPT_DIR}/assets"
 K3S_ASSETS_DIR="${ASSETS_DIR}/k3s"
 PLURAL_ASSETS_DIR="${ASSETS_DIR}/plural"
@@ -29,16 +29,16 @@ K3S_VERSION=${K3S_VERSION:-"1.32.0"}
 ARCH=$(current_arch)
 
 # Bundle images configuration
-K3S_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-k3s-bundle:${K3S_VERSION}"
+K3S_BUNDLE_IMAGE="ghcr.io/pluralsh/k3s-bundle:${K3S_VERSION}"
 PLURAL_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-bundle:1.0.0"
 PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.2.0"
 PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:1.0.0"
 
 download_assets_from_oci() {
-    local oci_image="${1}"
-    local assets_dir="${2}"
-    local temp_dir=$(mktemp -d)
-    local container_name="assets-$$"
+    oci_image="${1}"
+    assets_dir="${2}"
+    temp_dir=$(mktemp -d)
+    container_name="assets-$$"
 
     if [ -z "${oci_image}" ]; then
         echo "No OCI image specified"
@@ -93,8 +93,8 @@ download_assets_from_oci() {
 
 # Function to check if asset exists locally
 check_local_asset() {
-    local asset_path="$1"
-    if [ -f "${ASSETS_DIR}/${asset_path}" ]; then
+    asset_path="$1"
+    if [ -f "${asset_path}" ]; then
         echo "Using local asset: ${asset_path}"
         return 0
     else
@@ -113,7 +113,7 @@ vendor() {
 
     case "${target}" in
         k3s)
-            vendor::k3s
+            vendor_k3s
             ;;
         *)
             echo "Unknown vendor target: ${target}"
@@ -122,18 +122,18 @@ vendor() {
     esac
 }
 
-vendor::k3s() {
-    local assets_missing=false
+vendor_k3s() {
+    assets_missing=false
 
-    if ! check_local_asset "k3s-${ARCH}" >/dev/null 2>&1; then
+    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s-${ARCH}" >/dev/null 2>&1; then
         assets_missing=true
     fi
 
-    if ! check_local_asset "k3s-airgap-images-${ARCH}.tar.gz" >/dev/null 2>&1; then
+    if ! check_local_asset "${K3S_ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" >/dev/null 2>&1; then
         assets_missing=true
     fi
 
-    if ! check_local_asset "install.sh" >/dev/null 2>&1; then
+    if ! check_local_asset "${K3S_ASSETS_DIR}/install.sh" >/dev/null 2>&1; then
         assets_missing=true
     fi
 
@@ -143,9 +143,9 @@ vendor::k3s() {
     fi
 }
 
-install::k3s() {
-    local k3s_version="${1}"
-    local arch="${2}"
+install_k3s() {
+    k3s_version="${1}"
+    arch="${2}"
 
     if [ -z "${k3s_version}" ]; then
         echo "K3s version not specified"
@@ -160,17 +160,17 @@ install::k3s() {
     echo "Installing K3s version ${k3s_version} for architecture ${arch}..."
 
     # Install K3s binary
-    sudo cp "${ASSETS_DIR}/k3s-${ARCH}" /usr/local/bin/k3s
+    sudo cp "${K3S_ASSETS_DIR}/k3s-${ARCH}" /usr/local/bin/k3s
     sudo chmod +x /usr/local/bin/k3s
 
     # Setup K3s directories
     sudo mkdir -p "${LOCAL_IMAGES_DIR}"
 
     # Handle airgap images
-    sudo cp "${ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" "${K3S_LOCAL_IMAGES_DIR}/"
+    sudo cp "${K3S_ASSETS_DIR}/k3s-airgap-images-${ARCH}.tar.gz" "${K3S_LOCAL_IMAGES_DIR}/"
 
     # Get install script
-    cp "${ASSETS_DIR}/install.sh" /tmp/install.sh
+    cp "${K3S_ASSETS_DIR}/install.sh" /tmp/install.sh
     chmod +x /tmp/install.sh
 
     # Install K3s
@@ -186,8 +186,8 @@ install::k3s() {
 
     # Wait for K3s to start with continuous checking
     echo "Waiting for K3s to start..."
-    local max_attempts=60  # 5 minutes timeout
-    local attempt=0
+    max_attempts=60  # 5 minutes timeout
+    attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
         if sudo k3s kubectl get nodes >/dev/null 2>&1; then
@@ -213,4 +213,4 @@ install::k3s() {
 vendor k3s
 
 # Install K3s
-install::k3s "${K3S_VERSION}" "${ARCH}"
+install_k3s "${K3S_VERSION}" "${ARCH}"
