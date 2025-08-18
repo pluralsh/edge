@@ -9,18 +9,19 @@ K3S_ASSETS_DIR="${ASSETS_DIR}/k3s"
 PLURAL_ASSETS_DIR="${ASSETS_DIR}/plural"
 PLURAL_IMAGES_ASSETS_DIR="${ASSETS_DIR}/plural-images"
 PLURAL_TRUST_MANAGER_ASSETS_DIR="${ASSETS_DIR}/plural-trust-manager"
-
+DOWNLOAD_ASSETS_ONLY=false
 
 # K3s configuration
 K3S_LOCAL_IMAGES_DIR="/var/lib/rancher/k3s/agent/images"
 K3S_MANIFESTS_DIR="/var/lib/rancher/k3s/server/manifests"
+K3S_REGISTRY_FILE="/etc/rancher/k3s/registries.yaml"
 K3S_VERSION=${K3S_VERSION:-"1.32.0"}
 
 # Bundle images configuration
 K3S_BUNDLE_IMAGE="docker.io/floreks/k3s-bundle:${K3S_VERSION}" # TODO: change to pluralsh
 PLURAL_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-bundle:1.0.0"
-PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:0.2.0"
-PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:1.0.0"
+PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:1.0.0"
+PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.2.0"
 
 # Plural configuration
 PLURAL_CLI_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:0.12.0"
@@ -65,6 +66,10 @@ parse_args() {
                 URL="$2"
                 shift 2
                 ;;
+            --download-assets)
+                DOWNLOAD_ASSETS_ONLY=true
+                shift
+                ;;
             -h|--help)
                 usage
                 exit 0
@@ -76,6 +81,11 @@ parse_args() {
                 ;;
         esac
     done
+
+    if [ "$DOWNLOAD_ASSETS_ONLY" = true ]; then
+        echo "Downloading assets only. Use --token and --url to bootstrap K3s with Plural."
+        return 0
+    fi
 
     # Validate required arguments
     if [ -z "$TOKEN" ]; then
@@ -252,6 +262,9 @@ check_local_asset() {
     if [ -f "${asset_path}" ]; then
         echo "Using local asset: ${asset_path}"
         return 0
+    elif [ -d "${asset_path}" ] && [ "$(ls -A "${asset_path}")" ]; then
+        echo "Using local dir asset: ${asset_path}"
+        return 0
     else
         echo "Local asset not found: ${asset_path}"
         return 1
@@ -261,6 +274,15 @@ check_local_asset() {
 #############################################################################
 # Main functions
 #############################################################################
+
+# Downloads all required assets locally.
+download_all_assets() {
+    echo "Downloading all required assets locally..."
+    vendor plural
+    vendor k3s
+    vendor bundles
+    echo "All assets downloaded to ${ASSETS_DIR}"
+}
 
 # Vendor assets for K3s and Plural
 # Usage: vendor <target>
@@ -281,6 +303,9 @@ vendor() {
             ;;
         plural)
             vendor_plural
+            ;;
+        bundles)
+            vendor_bundles
             ;;
         *)
             echo "Unknown vendor target: ${target}"
@@ -315,12 +340,28 @@ vendor_k3s() {
 
 # Vendors Plural assets, downloading from OCI if not present locally.
 vendor_plural() {
-    if ! check_local_asset "${PLURAL_ASSETS_DIR}/job.yaml" >/dev/null 2>&1; then
-        echo "Plural bundle asset not found, downloading..."
+    if ! check_local_asset "${PLURAL_ASSETS_DIR}"; then
+        echo "Plural bundle assets not found, downloading..."
         download_assets_from_oci "${PLURAL_BUNDLE_IMAGE}" "${PLURAL_ASSETS_DIR}"
     fi
 
     echo "Plural assets are ready in ${PLURAL_ASSETS_DIR}"
+}
+
+# Vendors Plural images and trust manager assets, downloading from OCI if not present locally.
+vendor_bundles() {
+    if ! check_local_asset "${PLURAL_IMAGES_ASSETS_DIR}"; then
+        echo "Plural images bundle assets not found, downloading..."
+        download_assets_from_oci "${PLURAL_IMAGES_BUNDLE_IMAGE}" "${PLURAL_IMAGES_ASSETS_DIR}"
+        rm "${PLURAL_IMAGES_ASSETS_DIR}"/k3s-airgap-images-*.tar
+    fi
+
+    if ! check_local_asset "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"; then
+        echo "Plural trust manager bundle assets not found, downloading..."
+        download_assets_from_oci "${PLURAL_TRUST_MANAGER_BUNDLE_IMAGE}" "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"
+    fi
+
+    echo "Plural bundles assets are ready in ${PLURAL_IMAGES_ASSETS_DIR} and ${PLURAL_TRUST_MANAGER_ASSETS_DIR}"
 }
 
 # Installs K3s with the specified version, using assets from the vendor directory.
@@ -383,6 +424,7 @@ install_k3s() {
     echo "Kubeconfig: /etc/rancher/k3s/k3s.yaml"
 }
 
+# Installs Plural by templating assets and copying manifests to K3s directories.
 install_plural() {
     echo "Setting up Plural..."
 
@@ -406,12 +448,45 @@ install_plural() {
     echo "Plural setup complete!"
 }
 
+# Installs additional bundles for Plural, copying images and manifests to K3s directories.
+install_bundles() {
+  echo "Setting up additional bundles..."
+
+  echo "Copying Plural images to K3s images directory..."
+  sudo cp -rfv "${PLURAL_IMAGES_ASSETS_DIR}"/* "${K3S_LOCAL_IMAGES_DIR}"
+
+  echo "Copying trust manager manifests to K3s manifests directory..."
+  sudo cp -rfv "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"/* "${K3S_MANIFESTS_DIR}"
+
+  echo "Additional bundles setup complete!"
+}
+
+# Sets up the K3s registry configuration file.
+setup_registry() {
+    echo "Setting up K3s registry configuration..."
+
+    sudo mkdir -p "$(dirname "${K3S_REGISTRY_FILE}")"
+
+    # Create or overwrite the registries.yaml file
+    cat << EOF | sudo tee "${K3S_REGISTRY_FILE}" >/dev/null
+mirrors:
+  "*":
+EOF
+
+  echo "Registry configuration for K3s created at ${K3S_REGISTRY_FILE}"
+}
+
 ###############################################################################
 # Main script execution
 ###############################################################################
 main() {
     # Parse command line arguments
     parse_args "$@"
+
+    if [ "$DOWNLOAD_ASSETS_ONLY" = true ]; then
+        download_all_assets
+        exit 0
+    fi
 
     echo "Starting Plural bootstrap with:"
     echo "  Token: $(echo "$TOKEN" | cut -c1-5)..."
@@ -422,10 +497,13 @@ main() {
 
     # Vendor assets if needed
     vendor plural
+    vendor bundles
     vendor k3s
 
     # Install K3s
     install_plural
+    install_bundles
+    setup_registry
     install_k3s "${K3S_VERSION}"
 
     # Clean up assets directory
