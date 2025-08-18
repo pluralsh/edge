@@ -84,6 +84,7 @@ hack/k3s/bootstrap.sh
 ```
 
 ### Quick Start (Connected Device)
+Run as root:
 ```bash
 cd /path/on/device
 ./bootstrap.sh --token "$PLURAL_TOKEN" --url "console.example.com"
@@ -111,7 +112,7 @@ Copy to the target device (USB, scp, etc.):
 ```bash
 scp -r edge/hack/k3s /path/on/device
 ```
-On the device, run:
+On the device, run as root:
 ```bash
 cd /path/on/device
 ./bootstrap.sh --token "$PLURAL_TOKEN" --url "console.example.com"
