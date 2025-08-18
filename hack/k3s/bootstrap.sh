@@ -461,7 +461,7 @@ install_bundles() {
     echo "Copying Plural images to K3s images directory..."
     sudo cp -rfv "${PLURAL_IMAGES_ASSETS_DIR}"/* "${K3S_LOCAL_IMAGES_DIR}"
 
-    echo "Templating Plural assets..."
+    echo "Templating assets..."
     for FILE in "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"/*; do
       templ "CERT_MANAGER_VERSION" "${CERT_MANAGER_VERSION}" "${FILE}"
       templ "VERSION" "${TRUST_MANAGER_VERSION}" "${FILE}"
