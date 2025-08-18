@@ -18,7 +18,7 @@ K3S_REGISTRY_FILE="/etc/rancher/k3s/registries.yaml"
 K3S_VERSION=${K3S_VERSION:-"1.32.0"}
 
 # Bundle images configuration
-K3S_BUNDLE_IMAGE="docker.io/floreks/k3s-bundle:${K3S_VERSION}" # TODO: change to pluralsh
+K3S_BUNDLE_IMAGE="ghcr.io/pluralsh/k3s-bundle:${K3S_VERSION}"
 PLURAL_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-bundle:1.0.0"
 PLURAL_IMAGES_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-images-bundle:1.0.0"
 PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-bundle:0.2.0"
