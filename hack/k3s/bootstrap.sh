@@ -26,6 +26,10 @@ PLURAL_TRUST_MANAGER_BUNDLE_IMAGE="ghcr.io/pluralsh/kairos-plural-trust-manager-
 # Plural configuration
 PLURAL_CLI_IMAGE="ghcr.io/pluralsh/kairos-plural-cli:0.12.0"
 
+# Trust manager bundle configuration
+CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION:-"v1.16.2"}
+TRUST_MANAGER_VERSION=${TRUST_MANAGER_VERSION:-"v0.15.0"}
+
 # Command line arguments
 TOKEN=""
 URL=""
@@ -450,17 +454,23 @@ install_plural() {
 
 # Installs additional bundles for Plural, copying images and manifests to K3s directories.
 install_bundles() {
-  echo "Setting up additional bundles..."
+    echo "Setting up additional bundles..."
 
-  sudo mkdir -p "${K3S_LOCAL_IMAGES_DIR}"
+    sudo mkdir -p "${K3S_LOCAL_IMAGES_DIR}"
 
-  echo "Copying Plural images to K3s images directory..."
-  sudo cp -rfv "${PLURAL_IMAGES_ASSETS_DIR}"/* "${K3S_LOCAL_IMAGES_DIR}"
+    echo "Copying Plural images to K3s images directory..."
+    sudo cp -rfv "${PLURAL_IMAGES_ASSETS_DIR}"/* "${K3S_LOCAL_IMAGES_DIR}"
 
-  echo "Copying trust manager manifests to K3s manifests directory..."
-  sudo cp -rfv "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"/* "${K3S_MANIFESTS_DIR}"
+    echo "Templating Plural assets..."
+    for FILE in "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"/*; do
+      templ "CERT_MANAGER_VERSION" "${CERT_MANAGER_VERSION}" "${FILE}"
+      templ "VERSION" "${TRUST_MANAGER_VERSION}" "${FILE}"
+    done;
 
-  echo "Additional bundles setup complete!"
+    echo "Copying trust manager manifests to K3s manifests directory..."
+    sudo cp -rfv "${PLURAL_TRUST_MANAGER_ASSETS_DIR}"/* "${K3S_MANIFESTS_DIR}"
+
+    echo "Additional bundles setup complete!"
 }
 
 # Sets up the K3s registry configuration file.
