@@ -85,10 +85,13 @@ hack/k3s/bootstrap.sh
 
 ### Quick Start (Connected Device)
 ```bash
-cd hack/k3s
-export K3S_VERSION=1.32.0 # Optional: override k3s version (default 1.32.0). It must match the k3s-bundle image tag.
+cd /path/on/device
 ./bootstrap.sh --token "$PLURAL_TOKEN" --url "console.example.com"
 ```
+
+Optionally you can override `K3S_VERSION` environment variable to specify a different k3s version.
+It must be a valid tag in the `k3s-bundle` image.
+
 The script will:
 1. Validate system requirements (cgroups, iptables, root)
 2. Download (vendor) required assets from OCI if not already present (needs Docker)
@@ -108,7 +111,7 @@ Copy to the target device (USB, scp, etc.):
 ```bash
 scp -r edge/hack/k3s /path/on/device
 ```
-On the device, run (Docker not required now):
+On the device, run:
 ```bash
 cd /path/on/device
 ./bootstrap.sh --token "$PLURAL_TOKEN" --url "console.example.com"
