@@ -40,7 +40,7 @@ Usage: $0 [OPTIONS]
 Bootstrap script for K3s with Plural integration on edge devices.
 
 OPTIONS:
-    -t, --token TOKEN       Plural console authentication token (required)
+    -t, --token TOKEN      Plural console authentication token (required)
     -u, --url URL          Plural console URL (required)
     -h, --help             Show this help message
 
@@ -451,6 +451,8 @@ install_plural() {
 # Installs additional bundles for Plural, copying images and manifests to K3s directories.
 install_bundles() {
   echo "Setting up additional bundles..."
+
+  sudo mkdir -p "${K3S_LOCAL_IMAGES_DIR}"
 
   echo "Copying Plural images to K3s images directory..."
   sudo cp -rfv "${PLURAL_IMAGES_ASSETS_DIR}"/* "${K3S_LOCAL_IMAGES_DIR}"
