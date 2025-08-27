@@ -1,0 +1,68 @@
+name: CD / K3S Bundle
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*/v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'K3S version'
+        default: 'v1.32.0+k3s1'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    name: Build and push k3s-bundle image
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      packages: 'write'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/pluralsh/k3s-bundle
+            docker.io/pluralsh/k3s-bundle
+          tags: |
+            type=sha
+            type=match,pattern=k3s-bundle/v(.*),group=1
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ github.event.inputs.version }},enable=${{ github.event.inputs.version != '' }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to Docker
+        uses: docker/login-action@v3
+        with:
+          username: mjgpluralsh
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      - name: Build and push
+        if: ${{ startsWith(github.ref, format('refs/tags/{0}', 'k3s-bundle')) || github.ref == 'refs/heads/main' || github.event.inputs.version }}
+        uses: docker/build-push-action@v6
+        with:
+          context: "images/k3s-bundle"
+          file: "images/k3s-bundle/Dockerfile"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
+            K3S_VERSION=${{ github.event.inputs.version }}
