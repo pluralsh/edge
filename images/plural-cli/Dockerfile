@@ -1,4 +1,4 @@
-FROM alpine:3.22.0 AS build
+FROM alpine:3.22.1 AS build
 
 ARG TARGETARCH
 
@@ -12,7 +12,7 @@ ENV HELM_VERSION=v3.18.4
 ADD "https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" /
 RUN tar -xzvf /helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz linux-${TARGETARCH}/helm
 
-FROM --platform=$BUILDPLATFORM alpine:3.22.0
+FROM --platform=$BUILDPLATFORM alpine:3.22.1
 
 ARG TARGETARCH
 
